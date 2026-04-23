@@ -1,0 +1,53 @@
+# If sensor_readings already exists (e.g. Flask/Alembic), skip this changeset and mark it ran
+# so Liquibase stays in sync with the shared monorepo database.
+databaseChangeLog:
+  - changeSet:
+      id: 1-create-sensor-readings-table
+      author: iot-course
+      validCheckSum:
+        - 9:1eca20a18ca52de94c14e907769a0e3e
+        - 9:2013ccba7b09d37cd2d7d1ffc41f094c
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: sensor_readings
+      changes:
+        - createTable:
+            tableName: sensor_readings
+            columns:
+              # INTEGER + identity matches Flask/Alembic (SERIAL) for shared DB
+              - column:
+                  name: id
+                  type: INTEGER
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: sensor_id
+                  type: VARCHAR(128)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: temperature
+                  type: DOUBLE PRECISION
+                  constraints:
+                    nullable: false
+              - column:
+                  name: humidity
+                  type: DOUBLE PRECISION
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false
+        - createIndex:
+            indexName: ix_sensor_readings_sensor_id
+            tableName: sensor_readings
+            columns:
+              - column:
+                  name: sensor_id

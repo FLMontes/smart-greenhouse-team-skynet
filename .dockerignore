@@ -1,0 +1,21 @@
+# Keep `docker build` contexts small (builds use the repo root as context).
+
+.git
+.cursor
+
+**/node_modules
+**/.next
+**/dist
+**/build
+**/.turbo
+
+**/__pycache__
+**/.venv
+**/venv
+**/target
+**/.pio
+**/.pioenvs
+
+*.log
+.env
+.env.*

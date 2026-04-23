@@ -1,0 +1,99 @@
+# =========================
+# General
+# =========================
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+*.swp
+*.swo
+.env
+.env.local
+.env.production
+
+# =========================
+# C++ / PlatformIO (ESP32)
+# =========================
+.pio/
+.pioenvs/
+.piolibdeps/
+firmware/esp32/build/
+firmware/esp32/.cache/
+*.o
+*.a
+*.elf
+*.bin
+*.map
+
+# =========================
+# Java / Spring Boot
+# =========================
+target/
+*.class
+*.jar
+*.war
+*.ear
+*.iml
+.idea/
+.classpath
+.project
+.settings/
+hs_err_pid*
+backend/springboot/.mvn/wrapper/maven-wrapper.jar
+
+# =========================
+# Python / Flask
+# =========================
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.pycache
+.venv/
+venv/
+env/
+ENV/
+dist/
+build/
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+instance/
+*.sqlite3
+*.db
+
+# =========================
+# Node.js / NestJS / Next.js
+# =========================
+node_modules/
+.next/
+.nuxt/
+dist/
+.cache/
+*.tsbuildinfo
+.npm/
+.eslintcache
+.yarn/
+yarn-error.log
+npm-debug.log*
+pnpm-debug.log*
+
+# =========================
+# Docker
+# =========================
+docker/data/
+docker/volumes/
+
+# =========================
+# IDE / Editors
+# =========================
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+.fleet/
+.cursor
+
+openspec/
+skills-lock.json

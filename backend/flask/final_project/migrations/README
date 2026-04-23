@@ -1,0 +1,6 @@
+Flask-Migrate / Alembic migration scripts live here. Configuration is in
+``../alembic.ini`` (run all commands from ``backend/flask/final_project``):
+
+  export FLASK_APP=main:app
+  flask db migrate -m "message"
+  flask db upgrade
