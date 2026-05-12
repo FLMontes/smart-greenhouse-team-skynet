@@ -1,6 +1,6 @@
 import java.awt.*;
 
-public class InterfazGrafica {
+public class TransporteContext{
     private TransporteStrategy strategyActual;
 
     public void setTransporte(TransporteStrategy nuevaStrategy){
