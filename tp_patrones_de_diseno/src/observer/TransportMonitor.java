@@ -3,22 +3,21 @@ package observer;
 import java.util.ArrayList;
 import java.util.List;
 
+import strategy.TransportContext;
 import strategy.TransportStrategy;
 
 public class TransportMonitor {
     private final List<TransportObserver> observers;
-    private TransportStrategy strategy;
+    private final TransportContext context;
+    private boolean running;
 
-    public TransportMonitor() {
+    public TransportMonitor(TransportContext context) {
+        this.context = context;
         observers = new ArrayList<>();
     }
 
     public void addObserver(TransportObserver observer) {
         observers.add(observer);
-    }
-
-    public void setStrategy(TransportStrategy strategy) {
-        this.strategy = strategy;
     }
 
     public void notifyObservers(TransportSnapshot snapshot) {
@@ -28,6 +27,7 @@ public class TransportMonitor {
     }
 
     public void updateTransport() {
+        TransportStrategy strategy = context.getStrategy();
         if(strategy == null) {
             System.out.println("[ERROR] No hay transporte seleccionado");
             return;
@@ -37,5 +37,24 @@ public class TransportMonitor {
                                                            strategy.getDistance(),
                                                            strategy.getETA());
         notifyObservers(snapshot);
+    }
+
+    public void startMonitoring(int intervalMs) {
+        running = true;
+
+        new Thread(() -> {
+                            while(running) {
+                                updateTransport();
+                                try {Thread.sleep(intervalMs);} 
+                                catch (InterruptedException e) {
+                                    Thread.currentThread().interrupt();
+                                    running = false;
+                                }
+                            }
+                         }).start();
+    }    
+    
+    public void stop() {
+        running = false; 
     }
 }
