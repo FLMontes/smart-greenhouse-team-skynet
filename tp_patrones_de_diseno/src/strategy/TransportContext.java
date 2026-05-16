@@ -1,9 +1,11 @@
-import java.awt.*;
+package strategy;
 
-public class InterfazGrafica {
-    private TransporteStrategy strategyActual;
+//import java.awt.*;
 
-    public void setTransporte(TransporteStrategy nuevaStrategy){
+public class TransportContext{
+    private TransportStrategy strategyActual;
+
+    public void setTransport(TransportStrategy nuevaStrategy){
         this.strategyActual = nuevaStrategy;
         System.out.println("Cambiaste el vehiculo");
     }

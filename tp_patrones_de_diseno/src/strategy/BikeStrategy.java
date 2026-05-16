@@ -1,6 +1,9 @@
+package strategy;
+
 import java.util.Random;
-public class Bicicleta implements TransporteStrategy{
-    private Random rand = new Random();
+
+public class BikeStrategy implements TransportStrategy{
+    private final Random rand = new Random();
 
     @Override
     public String getName(){
