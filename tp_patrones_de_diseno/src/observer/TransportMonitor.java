@@ -57,4 +57,14 @@ public class TransportMonitor {
     public void stop() {
         running = false; 
     }
+
+    public void start() {
+        TransportStrategy strategy = context.getStrategy();
+
+        TransportSnapshot snapshot = new TransportSnapshot(strategy.getName(),
+                                                           strategy.getCost(),
+                                                           strategy.getDistance(),
+                                                           strategy.getETA());
+        notifyObservers(snapshot);
+    }
 }
