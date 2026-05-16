@@ -1,31 +1,62 @@
-import observer.*;
+import singleton.Logger;
 import strategy.*;
+import observer.*;
+
+import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        Logger logger = Logger.getInstance();
+        logger.logInfo("Inicio de la aplicacion");
 
-        TransportMonitor monitor = new TransportMonitor();
+        TransportStrategy taxi = new Taxi();
+        TransportStrategy bus = new Colectivo();
+        TransportStrategy bici = new Bicicleta();
 
-        ConsolePrinter printer = new ConsolePrinter();
+        TransportContext context = new TransportContext();
 
-        AlertObserver alert = new AlertObserver(3000, 35);
+        TransportMonitor monitor = new TransportMonitor(context);
 
-        monitor.addObserver(printer);
-        monitor.addObserver(alert);
+        ConsolePrinter consolePrinter = new ConsolePrinter();
+        AlertObserver alertObserver = new AlertObserver(5000, 30);
 
-        TransportStrategy taxi = new TaxiStrategy();
+        monitor.addObserver(consolePrinter);
+        monitor.addObserver(alertObserver);
 
-        TransportStrategy bus = new BusStrategy();
+        context.setTransport(taxi);
 
-        TransportStrategy bike = new BikeStrategy();
+        monitor.start();
 
-        monitor.setStrategy(taxi);
-        monitor.updateTransport();
+        Scanner scanner = new Scanner(System.in);
 
-        monitor.setStrategy(bus);
-        monitor.updateTransport();
+        while (true) {
+            logger.logInfo("1 - Taxi");
+            logger.logInfo("2 - Bus");
+            logger.logInfo("3 - Bicicleta");
 
-        monitor.setStrategy(bike);
-        monitor.updateTransport();
+            int option = scanner.nextInt();
+
+            switch (option) {
+                case 1:
+                    context.setTransport(taxi);
+                    break;
+
+                case 2:
+                    context.setTransport(bus);
+                    break;
+
+                case 3:
+                    context.setTransport(bici);
+                    break;
+
+                default:
+                    logger.logWarning("Opcion invalida");
+                
+                case 0:
+                    monitor.stop();
+                    System.out.println("Fin de la aplicacion");
+                    return;
+            }
+        }
     }
 }
