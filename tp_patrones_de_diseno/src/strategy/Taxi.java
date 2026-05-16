@@ -1,6 +1,6 @@
 package strategy;
 import java.util.Random;
-public class Taxi implements TransporteStrategy{
+public class Taxi implements TransportStrategy{
     private Random rand = new Random();
 
     @Override
@@ -15,7 +15,7 @@ public class Taxi implements TransporteStrategy{
 
     @Override
     public double getDistance() {
-        return 5.5;
+        return 5.0 + (rand.nextDouble() * 2.5);
     }
 
     @Override

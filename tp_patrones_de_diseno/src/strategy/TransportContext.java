@@ -1,12 +1,11 @@
 package strategy;
-import java.awt.*;
 
-public class TransporteContext{
-    private TransporteStrategy strategyActual;
+public class TransportContext{
+    private TransportStrategy strategyActual;
 
-    public void setTransporte(TransporteStrategy nuevaStrategy){
+    public void setTransport(TransportStrategy nuevaStrategy){
         this.strategyActual = nuevaStrategy;
-        System.out.println("Cambiaste el vehiculo");
+        System.out.println("Transporte cambiado a " + nuevaStrategy.getName());
     }
 
     public void mostrarDatosViaje() {
@@ -19,7 +18,11 @@ public class TransporteContext{
             System.out.println("--------------------------\n");
         }
         else {
-            System.out.println("¡Error! Primero debes elegir un medio de transporte.");
+            System.out.println("¡Error! Primero debes elegir un medio de Transporte.");
         }
+    }
+
+    public TransportStrategy getStrategy() {
+        return strategyActual;
     }
 }

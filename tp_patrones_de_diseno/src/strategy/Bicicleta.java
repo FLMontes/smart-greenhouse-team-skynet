@@ -1,6 +1,6 @@
 package strategy;
 import java.util.Random;
-public class Bicicleta implements TransporteStrategy{
+public class Bicicleta implements TransportStrategy{
     private Random rand = new Random();
 
     @Override
@@ -10,16 +10,16 @@ public class Bicicleta implements TransporteStrategy{
 
     @Override
     public double getCost() {
-        return 10 + (rand.nextDouble() * 40.0);
+        return rand.nextDouble() * 50.0;
     }
 
     @Override
     public double getDistance() {
-        return 5.5;
+        return 4.0 + (rand.nextDouble() * 1.5);
     }
 
     @Override
     public int getETA() {
-        return 40 + rand.nextInt(6);
+        return 20 + rand.nextInt(16);
     }
 }
