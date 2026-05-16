@@ -1,3 +1,4 @@
+package strategy;
 import java.awt.*;
 
 public class TransporteContext{

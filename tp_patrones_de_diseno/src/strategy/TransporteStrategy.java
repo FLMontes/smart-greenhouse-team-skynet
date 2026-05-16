@@ -1,4 +1,4 @@
-
+package strategy;
 public interface TransporteStrategy {
     String getName();  //Nombre del transporte
     double getCost();  //Costo del viaje
