@@ -1,10 +1,21 @@
 // Java
+package observer;
+
+// Defines alert rules
+public interface AlertService {
+
+    // Checks cost threshold
+    boolean shouldAlertCost(double cost);
+
+    // Checks ETA threshold
+    boolean shouldAlertETA(int eta);
+}
+/*
 public interface AlertService {
     boolean shouldAlertCost(double cost);
     boolean shouldAlertETA(int eta);
 }
 
-        /*
         Tests requeridos: Parte 2.1
               1. Costo por debajo del umbral → shouldAlertCost retorna false
               2. Costo exactamente en el umbral → definir y documentar el comportamiento esperado.

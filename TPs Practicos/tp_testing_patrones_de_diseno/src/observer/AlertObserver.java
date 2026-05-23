@@ -2,23 +2,32 @@ package observer;
 
 import singleton.Logger;
 
+// Observer that logs alerts
 public class AlertObserver implements TransportObserver {
-    private final Logger logger = Logger.getInstance();
-    private final double maxCost;
-    private final int maxEta;
 
-    public AlertObserver(double maxCost, int maxEta) {
-        this.maxCost = maxCost;
-        this.maxEta = maxEta;
+    private final Logger logger = Logger.getInstance();
+    private final AlertService alertService;
+
+    // Injects alert service
+    public AlertObserver(AlertService alertService) {
+        this.alertService = alertService;
     }
 
     @Override
     public void update(TransportSnapshot snapshot) {
-        if(snapshot.getCost() > maxCost){
-            logger.logWarning("Costo demasiado alto: $" + Math.round(snapshot.getCost()));
+
+        // Checks cost alert
+        if (alertService.shouldAlertCost(snapshot.getCost())) {
+            logger.logWarning(
+                    "High transport cost: $" + Math.round(snapshot.getCost())
+            );
         }
-        if(snapshot.getETA() > maxEta) {
-            logger.logWarning("ETA demasiado largo: " + snapshot.getETA() + " minutos");
+
+        // Checks ETA alert
+        if (alertService.shouldAlertETA(snapshot.getETA())) {
+            logger.logError(
+                    "High ETA: " + snapshot.getETA() + " minutes"
+            );
         }
     }
 }
