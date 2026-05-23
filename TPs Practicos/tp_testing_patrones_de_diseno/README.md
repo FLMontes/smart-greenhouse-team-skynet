@@ -1,4 +1,4 @@
-# TP Patrones de Diseño
+# TP Testing
 
 ## Integrantes
 - Martina Ciruzzi
