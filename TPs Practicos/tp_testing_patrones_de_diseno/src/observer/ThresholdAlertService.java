@@ -1,3 +1,5 @@
+package observer;
+
 public class ThresholdAlertService implements AlertService {
 
     private double maxCost;

@@ -19,6 +19,7 @@ public class Main {
 
         ConsolePrinter consolePrinter = new ConsolePrinter();
         AlertObserver alertObserver = new AlertObserver(5000, 30);
+        AlertObserver alertObserver = new AlertObserver(alertService);
 
         monitor.addObserver(consolePrinter);
         monitor.addObserver(alertObserver);

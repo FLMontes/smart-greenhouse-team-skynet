@@ -15,13 +15,13 @@ public class AlertObserver implements TransportObserver {
     }
 
     @Override
-    public void onUpdate(TransportSnapshot snapshot) {
+    public void update(TransportSnapshot snapshot) {
 
         if(alertService.shouldAlertCost(snapshot.cost())){
             logger.logWarning("Costo demasiado alto: $" + Math.round(snapshot.cost()));
         }
         if(alertService.shouldAlertETA(snapshot.eta())) {
-            logger.logWarning("ETA demasiado largo: " + snapshot.eta() + " minutos");
+            logger.logError("ETA demasiado largo: " + snapshot.eta() + " minutos");
         }
     }
 }
