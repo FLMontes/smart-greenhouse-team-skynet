@@ -10,53 +10,45 @@
 
 ---
 
+# Tareas a Realizar
+
+Tests requeridos: Parte 2.1
+1. Costo por debajo del umbral → shouldAlertCost retorna false
+2. Costo exactamente en el umbral → definir y documentar el comportamiento esperado.
+3. Costo por encima del umbral → shouldAlertCost retorna true .
+4. ETA por debajo del umbral → shouldAlertETA retorna false .
+5. ETA por encima del umbral → shouldAlertETA retorna true .
+
+Tests requeridos: Parte 2.2 
+1. Usando AlwaysAlertService : verificar que AlertObserver loggea cuando se notifica con cualquier snapshot .
+2. Usando un fake que siempre retorna false : verificar que AlertObserver no loggea nada .
+
+Tests requeridos: Parte 2.3
+1. Verificar que cuando shouldAlertCost retorna true , AlertObserver llama al logger con logWarning .
+2. Verificar que cuando shouldAlertETA retorna true , AlertObserver llama al logger con logError .
+3. Verificar que cuando ambas condiciones son false , el logger no es llamado en ningún momento.
+
+MODIFICAR EL "AlertObserver.java"
+
+MODIFICAR el "ReadMe"
+
+HACER "FakeAlertService.java"
+
+---
+
 # Evidencia y Resultados
 
-La aplicacion desarrollada implementa e integra los patrones de diseno **Strategy**, **Observer** y **Singleton** mediante un sistema de monitoreo de transportes.
-
-El sistema permite cambiar el medio de transporte desde consola mientras el monitoreo continua ejecutandose en tiempo real. Ademas, los observers reciben actualizaciones automaticas del estado del transporte seleccionado y el logger singleton registra los eventos de la aplicacion.
-
-Durante la ejecucion se verifica:
-
-- compilacion correcta del proyecto,
-- funcionamiento de las distintas estrategias de transporte,
-- actualizacion automatica de observers,
-- uso compartido de una unica instancia de `Logger`,
-- cambio dinamico de estrategia sin detener el monitoreo.
+HACER nuevo "Evidencia y Resultados"
 
 ---
 
 ## Video de ejecución
 
-https://drive.google.com/file/d/1hrKAeL6b0Sn1tqE1J3NhZGczJM87DQgL/view?usp=sharing
+HACER nuevo video de Ejecucion
 
 ---
 
 ## Ejemplo de ejecución
 
-```txt
-17/05/26 [INFO] Inicio de la aplicacion
 
-Transporte cambiado a Taxi
-
-17/05/26 [INFO] Transporte: Taxi
-17/05/26 [INFO] Costo: $3491
-17/05/26 [INFO] Distancia: 6 km
-17/05/26 [INFO] ETA: 11 minutos
-
-1 - Taxi
-2 - Bus
-3 - Bicicleta
-
-2
-
-Transporte cambiado a Colectivo
-
-1 - Taxi
-2 - Bus
-3 - Bicicleta
-
-0
-
-Fin de la aplicacion
-```
+HACER nuevo ejemplo de Ejecucion
