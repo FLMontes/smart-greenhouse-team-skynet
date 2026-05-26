@@ -5,12 +5,13 @@ import singleton.Logger;
 // Observer that logs alerts
 public class AlertObserver implements TransportObserver {
 
-    private final Logger logger = Logger.getInstance();
+    private final Logger logger;
     private final AlertService alertService;
 
-    // Injects alert service
-    public AlertObserver(AlertService alertService) {
+    // Inject dependencies
+    public AlertObserver(AlertService alertService, Logger logger) {
         this.alertService = alertService;
+        this.logger = logger;
     }
 
     @Override

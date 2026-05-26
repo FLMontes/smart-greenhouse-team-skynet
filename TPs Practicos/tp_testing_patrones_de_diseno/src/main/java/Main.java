@@ -19,7 +19,7 @@ public class Main {
 
         ConsolePrinter consolePrinter = new ConsolePrinter();
         AlertService alertService = new ThresholdAlertService(5000, 30);
-        AlertObserver alertObserver = new AlertObserver(alertService);
+        AlertObserver alertObserver = new AlertObserver(alertService, logger);
 
         monitor.addObserver(consolePrinter);
         monitor.addObserver(alertObserver);
