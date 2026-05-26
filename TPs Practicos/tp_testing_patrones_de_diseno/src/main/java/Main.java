@@ -18,7 +18,8 @@ public class Main {
         TransportMonitor monitor = new TransportMonitor(context);
 
         ConsolePrinter consolePrinter = new ConsolePrinter();
-        AlertObserver alertObserver = new AlertObserver(5000, 30);
+        AlertService alertService = new ThresholdAlertService(5000, 30);
+        AlertObserver alertObserver = new AlertObserver(alertService, logger);
 
         monitor.addObserver(consolePrinter);
         monitor.addObserver(alertObserver);
