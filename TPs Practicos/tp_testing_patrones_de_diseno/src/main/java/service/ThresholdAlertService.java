@@ -1,3 +1,7 @@
+<<<<<<< HEAD:TPs Practicos/tp_testing_patrones_de_diseno/src/main/java/service/ThresholdAlertService.java
+package service;
+
+=======
 package observer;
 
 // Alert implementation using thresholds
@@ -30,6 +34,7 @@ public class ThresholdAlertService implements AlertService {
 
 
 /*
+>>>>>>> testing-franco:TPs Practicos/tp_testing_patrones_de_diseno/src/observer/ThresholdAlertService.java
 // Implementación concreta
 
 public class ThresholdAlertService implements AlertService {

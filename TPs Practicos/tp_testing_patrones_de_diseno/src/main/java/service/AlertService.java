@@ -1,3 +1,7 @@
+<<<<<<< HEAD:TPs Practicos/tp_testing_patrones_de_diseno/src/main/java/service/AlertService.java
+package service;
+
+=======
 // Java
 package observer;
 
@@ -11,6 +15,7 @@ public interface AlertService {
     boolean shouldAlertETA(int eta);
 }
 /*
+>>>>>>> testing-franco:TPs Practicos/tp_testing_patrones_de_diseno/src/observer/AlertService.java
 public interface AlertService {
     boolean shouldAlertCost(double cost);
     boolean shouldAlertETA(int eta);
