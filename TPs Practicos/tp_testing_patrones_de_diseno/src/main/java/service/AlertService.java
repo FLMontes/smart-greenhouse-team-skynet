@@ -1,9 +1,4 @@
-<<<<<<< HEAD:TPs Practicos/tp_testing_patrones_de_diseno/src/main/java/service/AlertService.java
 package service;
-
-=======
-// Java
-package observer;
 
 // Defines alert rules
 public interface AlertService {
