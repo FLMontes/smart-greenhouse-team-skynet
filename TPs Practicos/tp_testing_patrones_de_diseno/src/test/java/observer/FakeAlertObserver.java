@@ -1,0 +1,38 @@
+package observer;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
+
+public class AlertObserverTest {
+
+    private FakeLogger fakeLogger;
+
+    @BeforeEach
+    public void setUp() {
+        fakeLogger = new FakeLogger();
+        fakeLogger.limpiarMensajes();
+    }
+
+    @Test
+    public void testAlertObserverLoggeaCuandoNotifica() {
+        FakeAlertService alwaysAlertService = new FakeAlertService(true, true);
+        AlertObserver observer = new AlertObserver(alwaysAlertService, fakeLogger);
+        TransportSnapshot snapshot = new TransportSnapshot(100.0, 50);
+
+        observer.update(snapshot);
+
+        assertTrue(fakeLogger.getMensajesGuardados().size() > 0);
+    }
+
+    @Test
+    public void testAlertObserverNoLoggeaNada() {
+        FakeAlertService neverAlertService = new FakeAlertService(false, false);
+        AlertObserver observer = new AlertObserver(neverAlertService, fakeLogger);
+        TransportSnapshot snapshot = new TransportSnapshot(10.0, 5);
+
+        observer.update(snapshot);
+
+        assertEquals(0, fakeLogger.getMensajesGuardados().size());
+    }
+}
