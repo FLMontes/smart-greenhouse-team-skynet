@@ -15,13 +15,13 @@ public class ThresholdAlertService implements AlertService {
     @Override
     public boolean shouldAlertCost(double cost) {
         // Returns true if cost exceeds limit
-        return cost > maxCost;
+        return cost >= maxCost;
     }
 
     @Override
     public boolean shouldAlertETA(int eta) {
         // Returns true if ETA exceeds limit
-        return eta > maxEta;
+        return eta >= maxEta;
     }
 }
 
