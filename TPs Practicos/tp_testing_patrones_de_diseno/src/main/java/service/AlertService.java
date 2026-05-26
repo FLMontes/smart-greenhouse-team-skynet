@@ -1,4 +1,4 @@
-package observer;
+package service;
 
 public interface AlertService {
 
