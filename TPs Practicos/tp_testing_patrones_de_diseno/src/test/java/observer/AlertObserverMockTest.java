@@ -1,6 +1,7 @@
 package observer;
 
 import org.junit.jupiter.api.Test;
+import service.AlertService;
 import singleton.Logger;
 
 import static org.mockito.ArgumentMatchers.anyDouble;

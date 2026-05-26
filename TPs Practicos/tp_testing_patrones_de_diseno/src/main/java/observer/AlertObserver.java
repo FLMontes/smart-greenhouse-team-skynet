@@ -1,5 +1,6 @@
 package observer;
 
+import service.AlertService;
 import singleton.Logger;
 
 // Observer that logs alerts
