@@ -1,4 +1,4 @@
-package observer;
+package logger;
 
 import singleton.Logger;
 import java.util.ArrayList;
