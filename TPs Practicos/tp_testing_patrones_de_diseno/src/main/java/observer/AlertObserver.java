@@ -1,16 +1,17 @@
 package observer;
 
 import service.AlertService;
+import singleton.ILogger;
 import singleton.Logger;
 
 // Observer that logs alerts
 public class AlertObserver implements TransportObserver {
 
-    private final Logger logger;
+    private final ILogger logger;
     private final AlertService alertService;
 
     // Inject dependencies
-    public AlertObserver(AlertService alertService, Logger logger) {
+    public AlertObserver(AlertService alertService, ILogger logger) {
         this.alertService = alertService;
         this.logger = logger;
     }
