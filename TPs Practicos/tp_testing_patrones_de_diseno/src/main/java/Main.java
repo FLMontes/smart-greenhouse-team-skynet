@@ -1,11 +1,18 @@
+import service.AlertService;
+import service.ThresholdAlertService;
 import singleton.Logger;
 import strategy.*;
 import observer.*;
+
+// 1. Agregamos los imports de tu nueva arquitectura
+import singleton.ILogger;
+import singleton.LoggerAdapter;
 
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) {
+        // Podés seguir usando el logger original para los mensajes del Main
         Logger logger = Logger.getInstance();
         logger.logInfo("Inicio de la aplicacion");
 
@@ -18,7 +25,13 @@ public class Main {
         TransportMonitor monitor = new TransportMonitor(context);
 
         ConsolePrinter consolePrinter = new ConsolePrinter();
-        AlertObserver alertObserver = new AlertObserver(5000, 30);
+        AlertService alertService = new ThresholdAlertService(5000, 30);
+
+        // 2. CREAMOS EL ADAPTADOR
+        ILogger loggerAdapter = new LoggerAdapter();
+
+        // 3. Le pasamos el ADAPTADOR al AlertObserver, no el logger original
+        AlertObserver alertObserver = new AlertObserver(alertService, loggerAdapter);
 
         monitor.addObserver(consolePrinter);
         monitor.addObserver(alertObserver);
@@ -51,7 +64,7 @@ public class Main {
 
                 default:
                     logger.logWarning("Opcion invalida");
-                
+
                 case 0:
                     monitor.stop();
                     System.out.println("Fin de la aplicacion");

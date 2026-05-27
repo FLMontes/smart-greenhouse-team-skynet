@@ -1,6 +1,9 @@
+
 package observer;
 
 import org.junit.jupiter.api.Test;
+import service.AlertService;
+import singleton.ILogger;
 import singleton.Logger;
 
 import static org.mockito.ArgumentMatchers.anyDouble;
@@ -15,7 +18,7 @@ public class AlertObserverMockTest {
 
         // Crear mocks
         AlertService alertService = mock(AlertService.class);
-        Logger logger = mock(Logger.class);
+        ILogger logger = mock(ILogger.class);
 
         // Configurar el comportamiento del mock
         when(alertService.shouldAlertCost(anyDouble())).thenReturn(true);
@@ -38,7 +41,7 @@ public class AlertObserverMockTest {
 
         // Crear mocks
         AlertService alertService = mock(AlertService.class);
-        Logger logger = mock(Logger.class);
+        ILogger logger = mock(ILogger.class);
 
         // Configurar el comportamiento del mock
         when(alertService.shouldAlertETA(anyInt())).thenReturn(true);
@@ -61,7 +64,7 @@ public class AlertObserverMockTest {
 
         // Crear mocks
         AlertService alertService = mock(AlertService.class);
-        Logger logger = mock(Logger.class);
+        ILogger logger = mock(ILogger.class);
 
         // Configurar el comportamiento del mock
         when(alertService.shouldAlertCost(anyDouble())).thenReturn(false);
