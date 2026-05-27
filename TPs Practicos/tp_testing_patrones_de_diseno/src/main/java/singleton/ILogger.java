@@ -5,4 +5,5 @@ public interface ILogger {
     void logDebug(String msg);
     void logInfo(String msg);
     void logError(String msg);
+
 }
