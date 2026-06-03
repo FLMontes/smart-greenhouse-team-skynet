@@ -1,1 +1,0 @@
-"""Flask blueprints (HTTP adapters)."""
