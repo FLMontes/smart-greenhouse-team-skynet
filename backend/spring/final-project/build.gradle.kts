@@ -1,5 +1,8 @@
+import org.gradle.api.plugins.quality.Checkstyle
+
 plugins {
 	java
+	checkstyle
 	id("org.springframework.boot") version "3.5.11"
 	id("io.spring.dependency-management") version "1.1.7"
 	id("org.asciidoctor.jvm.convert") version "4.0.5"
@@ -23,6 +26,19 @@ configurations {
 
 repositories {
 	mavenCentral()
+}
+
+checkstyle {
+	toolVersion = "10.21.2"
+	configDirectory.set(layout.projectDirectory.dir("config/checkstyle"))
+	isIgnoreFailures = false
+}
+
+tasks.withType<Checkstyle>().configureEach {
+	reports {
+		xml.required.set(false)
+		html.required.set(true)
+	}
 }
 
 extra["snippetsDir"] = file("build/generated-snippets")
