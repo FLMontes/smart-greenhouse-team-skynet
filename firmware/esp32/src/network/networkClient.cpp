@@ -1,4 +1,4 @@
-#include "network/network_client.hpp"
+#include "network/networkClient.hpp"
 
 #include <ArduinoJson.h>
 #include <HTTPClient.h>

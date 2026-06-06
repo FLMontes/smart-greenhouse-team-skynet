@@ -1,7 +1,7 @@
 #ifndef FIRMWARE_ESP32_INCLUDE_SENSORS_SENSOR_SERVICE_HPP
 #define FIRMWARE_ESP32_INCLUDE_SENSORS_SENSOR_SERVICE_HPP
 
-#include "app_config.hpp"
+#include "appConfig.hpp"
 #include "sensors/sensorTypes.hpp"
 
 namespace sensors {
