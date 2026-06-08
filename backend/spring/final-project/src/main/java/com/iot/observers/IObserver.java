@@ -1,3 +1,4 @@
+package com.iot.observers;
 /**
  * Interface for the Observer pattern.
  * Defines the contract for all observers that need to react to environmental changes.

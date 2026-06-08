@@ -1,3 +1,4 @@
+package com.iot.strategies;
 /**
  * Interface for the Strategy pattern.
  * Defines the contract for all algorithms that process environmental measurements.

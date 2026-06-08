@@ -1,3 +1,7 @@
+package com.iot.services;
+
+import com.iot.observers.IObserver;
+import com.iot.strategies.IAlgorithmStrategy;
 import java.util.ArrayList;
 import java.util.List;
 
