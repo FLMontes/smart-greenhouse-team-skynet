@@ -7,10 +7,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
-/**
- * Entity class representing an environmental measurement from the ESP32.
- * Contains data for temperature, humidity, light, CO2, and the physical button.
- */
 @Entity
 @Table(name = "measurements")
 public class Measurement {
@@ -26,7 +22,7 @@ public class Measurement {
     private LocalDateTime timestamp;
     private boolean buttonPressed;
 
-    // --- Getters ---
+    // Getters
     public Long getId() { return id; }
     public float getTemperature() { return temperature; }
     public float getHumidity() { return humidity; }
@@ -35,7 +31,7 @@ public class Measurement {
     public LocalDateTime getTimestamp() { return timestamp; }
     public boolean isButtonPressed() { return buttonPressed; }
 
-    // --- Setters ---
+    // Setters
     public void setId(Long id) { this.id = id; }
     public void setTemperature(float temperature) { this.temperature = temperature; }
     public void setHumidity(float humidity) { this.humidity = humidity; }
