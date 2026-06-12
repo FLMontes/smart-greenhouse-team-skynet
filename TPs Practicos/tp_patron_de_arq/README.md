@@ -10,12 +10,30 @@ Clean Architecture
 Se eligio Clean Architecture porque el sistema de control de acceso tiene una regla de negocio central clara: validar si una membresia esta activa y permitir o rechazar el ingreso. Esa logica debe quedar aislada de detalles tecnologicos como el lector RFID, la base de datos o el molinete fisico, y esta arquitectura nos permite separar la logica de negocio de estos detalles tecnologicos. Esto garantiza que los cambios en la infraestructura no afecten la logica central del sistema.
 La Clean Architecture permite separar el nucleo del sistema de la infraestructura mediante la Regla de Dependencia: las capas externas pueden depender de las internas, pero las internas no deben depender de las externas. Por eso, el caso de uso y el dominio no conocen si la persistencia se realiza con MySQL, PostgreSQL, archivos o cualquier otra tecnologia, ni tampoco conocen el modelo concreto del molinete.
 
+>[!NOTE]
+>No está mal. La justificación es válida, pero resulta algo ambigua ya que:
+>- El aislamiento de la lógica de negocio
+>- La independencia tecnológica
+>- La Regla de Dependencia
+>  
+>Son principios compartidos tanto por Clean Architecture como por Arquitectura Hexagonal.
+>Esto es natural porque ambas arquitecturas pertenecen a la misma familia de arquitecturas desacopladas y comparten muchos conceptos.
+>Para justificar específicamente la elección de Clean Architecture podrían profundizar en la necesidad de separar el sistema en más capas y responsabilidades, por ejemplo:
+>- Separación entre entidades, casos de uso y adaptadores
+>- Mayor organización del flujo de dependencias
+>- Preparación para una futura escalabilidad y mantenimiento del sistema
+>  
+>Actualmente la justificación explica correctamente por qué usar una arquitectura desacoplada, pero no termina de diferenciar claramente por qué se eligió Clean Architecture por sobre Hexagonal.
+
 ## Diagrama de Secuencia
 ![Diagrama de Secuencia](diagrams/diagrama-secuencia.jpg)
+>[!NOTE]
+>Excelente!! 😊​
 
 ## Diagrama de Componentes
 ![Diagrama de Componentes](diagrams/diagrama-componentes.jpg)
-
+>[!NOTE]
+>Muy bueno!! 😊​
 ## Responsabilidad de cada capa
 
 ### Capa de Dominio
@@ -65,3 +83,14 @@ El usuario acerca la tarjeta RFID al lector. El `LectorRFIDAdapter` captura el i
 
 El caso de uso consulta la membresia mediante `MembresiaRepository`, evalua la logica del dominio para verificar si la membresia esta activa y vigente, registra el acceso mediante `RegistroAccesoRepository` y si corresponde solicita la apertura mediante `MolineteGateway`.
 Las implementaciones concretas de esas interfaces viven en la capa de infraestructura. De esta forma se respeta la Regla de Dependencia de Clean Architecture: las capas externas dependen de las capas internas, pero las capas internas no dependen de las externas.
+
+
+>[!NOTE]
+>Excelente trabajo!!
+>**Nota: 10**
+
+>[!IMPORTANT]
+>La rama en la que se encuentra esta correción puede ser mergeada a `main`/`master` si el grupo lo desea.
+>También puede mantenerse independiente del proyecto.
+>**PERO NO SE DEBE BORRAR.**
+>Entonces se mantiene historial de correción. 😊​
