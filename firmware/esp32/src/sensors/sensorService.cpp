@@ -1,4 +1,4 @@
-#include "sensors/sensor_service.hpp"
+#include "sensors/sensorService.hpp"
 
 #include "sensors/mock_sensor_model.hpp"
 

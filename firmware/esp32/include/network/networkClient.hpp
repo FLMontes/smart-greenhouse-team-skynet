@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#include "app_config.hpp"
+#include "appConfig.hpp"
 #include "network/networkTypes.hpp"
 #include "sensors/sensorTypes.hpp"
 
