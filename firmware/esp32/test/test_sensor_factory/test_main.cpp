@@ -15,6 +15,15 @@ TEST(SensorFactoryTest, CreatesTemperatureSensorFromValidType)
     EXPECT_STREQ(sensor->type(), "temperature");
 }
 
+TEST(SensorFactoryTest, CreatesCo2SensorFromValidType)
+{
+    const auto sensor =
+        SensorFactory::createSensor("co2");
+
+    ASSERT_NE(sensor, nullptr);
+    EXPECT_STREQ(sensor->type(), "co2");
+}
+
 TEST(SensorFactoryTest, ReturnsNullForUnknownType)
 {
     const std::unique_ptr<Sensor> sensor = SensorFactory::createSensor("unknown");

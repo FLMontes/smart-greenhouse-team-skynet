@@ -3,6 +3,8 @@
 
 #include "appConfig.hpp"
 #include "sensors/sensorTypes.hpp"
+#include <SparkFunHTU21D.h>
+#include <Wire.h>
 
 namespace sensors {
 
@@ -32,10 +34,11 @@ public:
      *
      * @return SensorReading Telemetry sample ready to publish.
      */
-    SensorReading read() const;
+    SensorReading read();
 
 private:
     const app::AppConfig& config_;
+    HTU21D htu21d_;
 };
 
 }  // namespace sensors
