@@ -1,4 +1,7 @@
 package com.iot.strategies;
+
+import com.iot.models.entities.Measurement;
+
 /**
  * Interface for the Strategy pattern.
  * Defines the contract for all algorithms that process environmental measurements.
