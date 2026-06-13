@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build and publish release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: maven
+          cache-dependency-path: "TPs Practicos/tp_testing_patrones_de_diseno/pom.xml"
+
+      - name: Package JAR
+        run: mvn -B package
+        working-directory: "TPs Practicos/tp_testing_patrones_de_diseno"
+
+      - name: List generated files
+        run: ls -lh "TPs Practicos/tp_testing_patrones_de_diseno/target"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "${GITHUB_REF_NAME}" "TPs Practicos/tp_testing_patrones_de_diseno"/target/*.jar --generate-notes
