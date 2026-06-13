@@ -33,6 +33,24 @@ public:
     }
 };
 
+class Co2Sensor : public Sensor
+{
+public:
+    const char* type() const override
+    {
+        return "co2";
+    }
+};
+
+class LightSensor : public Sensor
+{
+public:
+    const char* type() const override
+    {
+        return "light";
+    }
+};
+
 class SensorFactory
 {
 public:
@@ -41,6 +59,16 @@ public:
         if (type == nullptr)
         {
             return nullptr;
+        }
+
+        if (std::strcmp(type, "co2") == 0)
+        {
+            return std::unique_ptr<Sensor>(new Co2Sensor());
+        }
+
+        if (std::strcmp(type, "light") == 0)
+        {
+            return std::unique_ptr<Sensor>(new LightSensor());
         }
 
         if (std::strcmp(type, "temperature") == 0)
