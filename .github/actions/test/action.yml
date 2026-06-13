@@ -1,0 +1,18 @@
+name: Test
+description: Run unit tests for the Java Maven project
+
+runs:
+  using: composite
+  steps:
+    - name: Set up Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: temurin
+        java-version: '17'
+        cache: maven
+        cache-dependency-path: "TPs Practicos/tp_testing_patrones_de_diseno/pom.xml"
+
+    - name: Run unit tests
+      shell: bash
+      run: mvn -B test
+      working-directory: "TPs Practicos/tp_testing_patrones_de_diseno"

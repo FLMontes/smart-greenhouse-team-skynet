@@ -1,1 +1,0 @@
-"""Domain models (entities + schemas)."""

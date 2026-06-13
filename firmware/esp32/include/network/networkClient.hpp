@@ -3,7 +3,7 @@
 
 #include <Arduino.h>
 
-#include "app_config.hpp"
+#include "appConfig.hpp"
 #include "network/networkTypes.hpp"
 #include "sensors/sensorTypes.hpp"
 
@@ -73,6 +73,7 @@ private:
     static void logMessage(const String& message);
 
     const app::AppConfig& config_;
+    unsigned long lastWifiRetryAt_;
 };
 
 }  // namespace network
