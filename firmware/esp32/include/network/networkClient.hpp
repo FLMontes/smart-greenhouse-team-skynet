@@ -73,6 +73,7 @@ private:
     static void logMessage(const String& message);
 
     const app::AppConfig& config_;
+    unsigned long lastWifiRetryAt_;
 };
 
 }  // namespace network
