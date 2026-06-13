@@ -1,0 +1,26 @@
+#!/bin/sh
+set -e
+
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+
+echo "Running backend linter..."
+cd "$ROOT_DIR/backend/spring/final-project"
+
+if [ -f "./gradlew" ]; then
+    ./gradlew checkstyleMain checkstyleTest
+elif [ -f "./gradlew.bat" ]; then
+    cmd.exe /c gradlew.bat checkstyleMain checkstyleTest
+else
+    echo "Gradle wrapper not found."
+    exit 1
+fi
+
+echo "Running frontend linter..."
+cd "$ROOT_DIR/frontend/dashboard"
+npm run lint
+
+echo "Running firmware linter..."
+cd "$ROOT_DIR/firmware/esp32"
+pio check -e esp32dev
+
+echo "Pre-commit linters completed successfully."

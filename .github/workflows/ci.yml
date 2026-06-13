@@ -1,0 +1,81 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+    backend:
+    name: Backend - Build and unit tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Give Gradle wrapper permission
+        run: chmod +x ./gradlew
+
+      - name: Build backend
+        run: ./gradlew build
+
+      - name: Run backend unit tests
+        run: ./gradlew test
+
+  frontend:
+    name: Frontend - Build and unit tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend/dashboard
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+          cache-dependency-path: frontend/dashboard/package-lock.json
+
+      - name: Install frontend dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+      - name: Run frontend unit tests
+        run: npm test -- --run
+
+  firmware:
+    name: Firmware - Unit tests
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: firmware/esp32
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PlatformIO
+        run: pip install platformio
+
+      - name: Run firmware unit tests
+        run: pio test -e native_test
