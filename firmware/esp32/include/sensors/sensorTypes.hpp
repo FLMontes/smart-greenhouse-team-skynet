@@ -16,6 +16,8 @@ struct SensorReading {
   String sensorId;
   float temperature;
   float humidity;
+  float co2;
+  float light;
 };
 
 }  // namespace sensors
