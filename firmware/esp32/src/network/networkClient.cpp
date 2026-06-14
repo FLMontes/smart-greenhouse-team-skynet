@@ -58,7 +58,7 @@ namespace network {
         }
 
         HTTPClient http;
-        const String endpoint = String(config_.backendBaseUrl) + "/sensors";
+        const String endpoint = String(config_.backendBaseUrl) + "/api/measurements";
 
         if (!http.begin(endpoint))
         {
@@ -69,10 +69,11 @@ namespace network {
         http.addHeader("Content-Type", "application/json");
 
         JsonDocument payload;
-        payload["deviceId"] = reading.deviceId;
-        payload["sensorId"] = reading.sensorId;
         payload["temperature"] = reading.temperature;
         payload["humidity"] = reading.humidity;
+        payload["light"] = reading.light;
+        payload["co2"] = reading.co2;
+        payload["buttonPressed"] = reading.buttonPressed;
 
         String body;
         serializeJson(payload, body);
