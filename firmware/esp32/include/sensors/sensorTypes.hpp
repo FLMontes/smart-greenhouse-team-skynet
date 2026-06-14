@@ -18,6 +18,7 @@ struct SensorReading {
   float humidity;
   float co2;
   float light;
+  bool buttonPressed;
 };
 
 }  // namespace sensors
