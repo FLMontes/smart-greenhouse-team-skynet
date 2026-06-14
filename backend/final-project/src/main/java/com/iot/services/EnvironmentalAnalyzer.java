@@ -3,10 +3,12 @@ package com.iot.services;
 import com.iot.models.entities.Measurement;
 import com.iot.observers.IObserver;
 import com.iot.repositories.IMeasurementRepository;
+import org.springframework.stereotype.Service;
 import com.iot.strategies.IAlgorithmStrategy;
 import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class EnvironmentalAnalyzer {
 
     private Measurement currentMeasurement;

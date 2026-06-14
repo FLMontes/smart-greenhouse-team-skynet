@@ -1,6 +1,6 @@
-import org.junit.jupiter.api.Test;
+package com.iot.strategies;
 
-import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.Test;
 
 class TemperatureStrategyTest {
 
