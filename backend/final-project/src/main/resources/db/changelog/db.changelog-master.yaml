@@ -51,46 +51,29 @@ databaseChangeLog:
             columns:
               - column:
                   name: sensor_id
-  # =========================================================
-  #                       DISEÑO PROPIO
-  # =========================================================
+
   - changeSet:
-      id: 2-create-measurements-table
-      author: skynet
-      preConditions:
-        - onFail: MARK_RAN
-        - not:
-            tableExists:
-              tableName: measurements
+      id: 2-add-missing-sensor-columns
+      author: iot-team
       changes:
-        - createTable:
-            tableName: measurements
+        - addColumn:
+            tableName: sensor_readings
             columns:
               - column:
-                  name: id
-                  type: BIGINT
-                  autoIncrement: true
+                  name: light
+                  type: DOUBLE PRECISION
+                  defaultValueNumeric: 0
                   constraints:
-                    primaryKey: true
                     nullable: false
               - column:
-                  name: temperature
-                  type: REAL
-              - column:
-                  name: humidity
-                  type: REAL
-              - column:
-                  name: light
-                  type: REAL
-              - column:
                   name: co2
-                  type: REAL
+                  type: DOUBLE PRECISION
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
               - column:
                   name: button_pressed
                   type: BOOLEAN
-              - column:
-                  name: timestamp
-                  type: TIMESTAMPTZ
-                  defaultValueComputed: CURRENT_TIMESTAMP
+                  defaultValueBoolean: false
                   constraints:
                     nullable: false

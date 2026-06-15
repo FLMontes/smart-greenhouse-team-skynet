@@ -1,7 +1,9 @@
 package com.iot.controllers;
 
+import com.iot.models.dto.ActuatorStatus;
 import com.iot.models.dto.MeasurementInput;
 import com.iot.models.entities.Measurement;
+import com.iot.observers.HardwareAlarmObserver;
 import com.iot.repositories.IMeasurementRepository;
 import com.iot.services.EnvironmentalAnalyzer;
 import jakarta.validation.Valid;
@@ -18,36 +20,70 @@ public class MeasurementController {
 
     private final EnvironmentalAnalyzer analyzer;
     private final IMeasurementRepository repository;
+    private final HardwareAlarmObserver hardwareObserver;
 
-    // Constructor Injection (¡La best practice que te elogiaron!)
-    public MeasurementController(EnvironmentalAnalyzer analyzer, IMeasurementRepository repository) {
+    // Constructor-based dependency injection
+    public MeasurementController(EnvironmentalAnalyzer analyzer, IMeasurementRepository repository, HardwareAlarmObserver hardwareObserver) {
         this.analyzer = analyzer;
         this.repository = repository;
+        this.hardwareObserver = hardwareObserver;
     }
 
     @PostMapping
     public ResponseEntity<Measurement> receiveMeasurement(@Valid @RequestBody MeasurementInput input) {
         Measurement m = new Measurement();
 
-        // Mapeo manual limpio
+        // Clean manual mapping
         m.setTemperature(input.getTemperature());
         m.setHumidity(input.getHumidity());
         m.setLight(input.getLight());
         m.setCo2(input.getCo2());
         m.setButtonPressed(input.getButtonPressed());
 
-        // Hora del servidor en UTC
+        // Server timestamp in UTC
         m.setTimestamp(LocalDateTime.now());
 
-        // Guardamos en la base y analizamos (T26)
+        // Persist the new measurement to the database
         repository.save(m);
         analyzer.analyzeMeasurement(m);
 
+        // Return HTTP 201 Created
         return ResponseEntity.status(HttpStatus.CREATED).body(m);
     }
 
     @GetMapping
     public ResponseEntity<List<Measurement>> getHistory() {
         return ResponseEntity.ok(repository.getHistory());
+    }
+
+    // NEW: Endpoint for the WebDashboardObserver to fetch the latest data
+    @GetMapping("/latest")
+    public ResponseEntity<Measurement> getLatestMeasurement() {
+        Measurement m = analyzer.getCurrentMeasurement();
+        if (m == null) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(m);
+    }
+
+    // NEW: Endpoint to expose the hardware actuators status.
+    // This will solve all the "never used" yellow warnings in ActuatorStatus!
+    @GetMapping("/actuators/status")
+    public ResponseEntity<ActuatorStatus> getActuatorStatus() {
+        ActuatorStatus status = new ActuatorStatus();
+
+        // We use the setters here. Spring Boot (Jackson) will automatically
+        // use the getters when converting this object to JSON!
+        status.setBasedOnMeasurementId(hardwareObserver.getBasedOnMeasurementId());
+        status.setTimestamp(hardwareObserver.getTimestamp());
+        status.setFanStatus(hardwareObserver.isFanStatus());
+        status.setBuzzerStatus(hardwareObserver.isBuzzerStatus());
+        status.setMotorStatus(hardwareObserver.isMotorStatus());
+        status.setResistorStatus(hardwareObserver.isResistorStatus());
+        status.setAlarmMuted(hardwareObserver.isAlarmMuted());
+        status.setRgbColorCommand(hardwareObserver.getRgbColorCommand());
+        status.setLedIntensityCommand(hardwareObserver.getLedIntensityCommand());
+
+        return ResponseEntity.ok(status);
     }
 }

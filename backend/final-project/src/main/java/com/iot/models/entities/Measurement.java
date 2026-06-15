@@ -1,6 +1,11 @@
 package com.iot.models.entities;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.time.LocalDateTime;
@@ -10,13 +15,13 @@ import lombok.Setter;
 @Getter
 @Setter
 @Entity
-@Table(name = "measurements")
+@Table(name = "sensor_readings")
 
 public class Measurement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
 
     @Min(value = -10, message = "Temperature cannot be less than -10")
     @Max(value = 60, message = "Temperature cannot be greater than 60")
@@ -34,6 +39,7 @@ public class Measurement {
     @Max(value = 5000, message = "CO2 cannot be greater than 5000")
     private Float co2;
 
+    @Column(name = "created_at")
     private LocalDateTime timestamp;
 
     @Column(name = "button_pressed")
