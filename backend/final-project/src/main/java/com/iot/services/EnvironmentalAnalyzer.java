@@ -23,6 +23,7 @@ public class EnvironmentalAnalyzer {
 
     // --- ESTADO CENTRALIZADO ---
     private Measurement currentMeasurement;
+    private Measurement currentAveragedMeasurement; // <-- NUEVO: Guardamos el dato promediado
     private List<AlgorithmResult> latestAlgorithmResults = new ArrayList<>();
 
     // NUEVO: Lista de alertas activas y un generador de IDs (Punto 6)
@@ -44,7 +45,8 @@ public class EnvironmentalAnalyzer {
         }
     }
 
-    public void analyzeMeasurement(Measurement m) {
+    // APLICADO: 'synchronized' asegura que el ciclo completo sea atómico (hilo seguro)
+    public synchronized void analyzeMeasurement(Measurement m) {
         this.currentMeasurement = m;
 
         // 1. Obtener ventana histórica
@@ -53,6 +55,7 @@ public class EnvironmentalAnalyzer {
 
         // 2. Construir la medición promediada
         Measurement averaged = buildAveragedMeasurement(window);
+        this.currentAveragedMeasurement = averaged; // <-- NUEVO: Lo guardamos de forma segura
 
         // 3. Crear el Contexto de Análisis
         AnalysisContext context = new AnalysisContext(averaged, window, m.getId(), LocalDateTime.now());
@@ -118,6 +121,7 @@ public class EnvironmentalAnalyzer {
 
     // --- GETTERS ---
     public Measurement getCurrentMeasurement() { return currentMeasurement; }
+    public Measurement getCurrentAveragedMeasurement() { return currentAveragedMeasurement; } // <-- NUEVO GETTER
     public List<AlgorithmResult> getLatestAlgorithmResults() { return latestAlgorithmResults; }
-    public List<Alert> getActiveAlerts() { return activeAlerts; } // El getter para el controlador
+    public List<Alert> getActiveAlerts() { return activeAlerts; }
 }
