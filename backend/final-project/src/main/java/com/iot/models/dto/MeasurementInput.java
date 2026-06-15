@@ -3,12 +3,9 @@ package com.iot.models.dto;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-@Getter
-@Setter
-
+@Data
 public class MeasurementInput {
 
     @NotNull(message = "La temperatura es obligatoria")

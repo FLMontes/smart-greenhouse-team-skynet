@@ -1,6 +1,7 @@
 package com.iot.strategies;
 
-import com.iot.models.entities.Measurement;
+import com.iot.models.dto.AnalysisContext;
+import com.iot.models.dto.AlgorithmResult;
 
 /**
  * Interface for the Strategy pattern.
@@ -9,10 +10,10 @@ import com.iot.models.entities.Measurement;
 public interface IAlgorithmStrategy {
 
     /**
-     * Processes a measurement to evaluate specific environmental conditions
-     * (like temperature, humidity, CO2, etc.).
-     *
-     * @param m The measurement object to be processed.
+     * Processes an analysis context (averaged/historical data) to evaluate specific conditions.
+     * @param context The context containing averaged and historical measurements.
+     * @return The specific result of the algorithm.
      */
-    void process(Measurement m);
+    AlgorithmResult process(AnalysisContext context);
+
 }

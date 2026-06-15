@@ -1,63 +1,45 @@
 package com.iot.strategies;
 
-import com.iot.models.entities.Measurement;
 import org.springframework.stereotype.Component;
+import com.iot.models.dto.AnalysisContext;
+import com.iot.models.dto.AlgorithmResult;
+import java.time.LocalDateTime;
 
 @Component
 public class HumidityStrategy implements IAlgorithmStrategy {
 
     private static final float DEFAULT_MIN_HUMIDITY = 40.0f;
-    private static final float MIN_ALLOWED_HUMIDITY = 0.0f;
-    private static final float MAX_ALLOWED_HUMIDITY = 100.0f;
-
     private float minHumidity;
-    private boolean wateringRequired;
 
     public HumidityStrategy() {
-        this(DEFAULT_MIN_HUMIDITY);
-    }
-
-    public HumidityStrategy(float minHumidity) {
-        setMinHumidity(minHumidity);
+        this.minHumidity = DEFAULT_MIN_HUMIDITY;
     }
 
     @Override
-    public void process(Measurement measurement) {
-        if (measurement == null) {
-            throw new IllegalArgumentException(
-                "Measurement must not be null"
-            );
+    public AlgorithmResult process(AnalysisContext context) {
+        if (context == null || context.getAveragedMeasurement() == null) {
+            throw new IllegalArgumentException("AnalysisContext must not be null");
         }
 
-        evaluate(measurement.getHumidity());
+        // 1. Tomamos la humedad promediada
+        float avgHumidity = context.getAveragedMeasurement().getHumidity();
+
+        // 2. Evaluamos si necesita riego (1.0 = Sí, 0.0 = No)
+        float statusValue = (avgHumidity < minHumidity) ? 1.0f : 0.0f;
+
+        // 3. Devolvemos el resultado
+        return new AlgorithmResult(
+                "HumidityStrategy",
+                "Evaluates humidity to determine watering needs.",
+                "PostgreSQL measurements table",
+                "Last " + context.getSourceMeasurements().size() + " stored measurements",
+                "wateringRequired",
+                statusValue,
+                "boolean",
+                LocalDateTime.now()
+        );
     }
 
-    public void evaluate(float humidity) {
-        validateHumidity(humidity);
-        wateringRequired = humidity < minHumidity;
-    }
-
-    public boolean isWateringRequired() {
-        return wateringRequired;
-    }
-
-    public float getMinHumidity() {
-        return minHumidity;
-    }
-
-    public void setMinHumidity(float minHumidity) {
-        validateHumidity(minHumidity);
-        this.minHumidity = minHumidity;
-    }
-
-    private void validateHumidity(float humidity) {
-        if (!Float.isFinite(humidity)
-            || humidity < MIN_ALLOWED_HUMIDITY
-            || humidity > MAX_ALLOWED_HUMIDITY) {
-
-            throw new IllegalArgumentException(
-                "Humidity must be between 0 and 100"
-            );
-        }
-    }
+    public float getMinHumidity() { return minHumidity; }
+    public void setMinHumidity(float minHumidity) { this.minHumidity = minHumidity; }
 }

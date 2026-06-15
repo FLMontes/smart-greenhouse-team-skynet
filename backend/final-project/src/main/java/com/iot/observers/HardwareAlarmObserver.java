@@ -1,128 +1,102 @@
 package com.iot.observers;
 
-import com.iot.models.entities.Measurement;
+import com.iot.models.dto.AlgorithmResult;
 import com.iot.services.EnvironmentalAnalyzer;
-import com.iot.strategies.CO2Strategy;
-import com.iot.strategies.HumidityStrategy;
-import com.iot.strategies.LightStrategy;
-import com.iot.strategies.TemperatureStrategy;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Component
 public class HardwareAlarmObserver implements IObserver {
 
-    // Attributes defined in the class diagram
     private boolean fanStatus;
-    private boolean alarmEnabled = true; // By default, the alarm is enabled
     private boolean buzzerStatus;
-    private boolean motorStatus; // Watering motor
-    private boolean resistorStatus; // Heating resistor
-    private String rgbColorCommand = "#00FF00"; // GREEN (Normal state)
+    private boolean motorStatus;
+    private boolean resistorStatus;
+    private String rgbColorCommand = "#00FF00"; // GREEN
     private int ledIntensityCommand;
-
-    // Attributes strictly required by the OpenAPI contract
     private Integer basedOnMeasurementId;
     private LocalDateTime timestamp;
+    private boolean alarmMuted = false;
 
-    // References to the subject and the specific strategies
     private final EnvironmentalAnalyzer analyzer;
-    private final TemperatureStrategy tempStrategy;
-    private final HumidityStrategy humStrategy;
-    private final CO2Strategy co2Strategy;
-    private final LightStrategy lightStrategy;
 
-    // Constructor: Inject everything we need to make physical decisions
-    public HardwareAlarmObserver(
-            EnvironmentalAnalyzer analyzer,
-            TemperatureStrategy tempStrategy,
-            HumidityStrategy humStrategy,
-            CO2Strategy co2Strategy,
-            LightStrategy lightStrategy) {
-
+    // Fíjate que ya no inyectamos las estrategias aquí. ¡Código mucho más limpio!
+    public HardwareAlarmObserver(EnvironmentalAnalyzer analyzer) {
         this.analyzer = analyzer;
-        this.tempStrategy = tempStrategy;
-        this.humStrategy = humStrategy;
-        this.co2Strategy = co2Strategy;
-        this.lightStrategy = lightStrategy;
-
-        // Subscribe to the analyzer
         this.analyzer.attach(this);
     }
 
     @Override
     public void update() {
-        // 1. Get the current measurement
-        Measurement m = analyzer.getCurrentMeasurement();
-        if (m == null) return;
+        if (analyzer.getCurrentMeasurement() == null) return;
 
-        // 2. Save metadata for the API response
-        this.basedOnMeasurementId = m.getId();
+        this.basedOnMeasurementId = analyzer.getCurrentMeasurement().getId();
         this.timestamp = LocalDateTime.now();
 
-        // 3. PHYSICAL MUTE LOGIC
-        if (m.isButtonPressed()) {
-            this.alarmEnabled = false;
+        // Lógica de Silencio (Mute)
+        // Lógica de Silencio (Mute)
+        if (analyzer.getCurrentMeasurement().isButtonPressed() != null &&
+                analyzer.getCurrentMeasurement().isButtonPressed()) {
+            this.alarmMuted = true;
             this.buzzerStatus = false;
+        } else {
+            this.alarmMuted = false;
         }
 
-        // 4. RESET ACTUATORS (Assume everything is OK before checking)
         resetActuators();
 
-        // 5. EVALUATE STRATEGIES AND ACTIVATE HARDWARE
+        // 1. Le pedimos al Analizador los resultados procesados
+        List<AlgorithmResult> results = analyzer.getLatestAlgorithmResults();
 
-        // Temperature logic
-        if (tempStrategy.isTooHot()) {
-            setRGBCommand("#FF0000"); // RED for Heat
-            setFanCommand(true);      // Cool down
-            if (alarmEnabled) setBuzzerCommand(true);
-        } else if (tempStrategy.isTooCold()) {
-            setRGBCommand("#0000FF"); // BLUE for Cold
-            setResistorCommand(true); // Heat up
-            if (alarmEnabled) setBuzzerCommand(true);
-        }
-
-        // Humidity logic
-        if (humStrategy.isWateringRequired()) {
-            setRGBCommand("#FFFFFF"); // WHITE for watering
-            setMotorCommand(true);    // Turn on water pump
-            if (alarmEnabled) setBuzzerCommand(true);
-        }
-
-        // CO2 logic
-        if (co2Strategy.isVentilationRequired()) {
-            setRGBCommand("#FFC0CB"); // PINK for bad air quality
-            setFanCommand(true);      // Ventilate
-            if (alarmEnabled) setBuzzerCommand(true);
-        }
-
-        // Light logic (Corregido según nuestra charla para el RF-12 y ALG-05) [4, 5]
-        if (lightStrategy.getLightDeficit() > 0) {
-            setRGBCommand("#FFFF00"); // YELLOW for low light
-            setLEDStripCommand(80);   // Turn on LED strip
-            if (alarmEnabled) setBuzzerCommand(true);
+        // 2. Encendemos actuadores basados en esos resultados
+        for (AlgorithmResult res : results) {
+            switch (res.getAlgorithm()) {
+                case "TemperatureStrategy":
+                    if (res.getValue() == 1.0f) { // Too Hot
+                        this.rgbColorCommand = "#FF0000"; // RED
+                        this.fanStatus = true;
+                        if (!alarmMuted) this.buzzerStatus = true;
+                    } else if (res.getValue() == -1.0f) { // Too Cold
+                        this.rgbColorCommand = "#0000FF"; // BLUE
+                        this.resistorStatus = true;
+                        if (!alarmMuted) this.buzzerStatus = true;
+                    }
+                    break;
+                case "HumidityStrategy":
+                    if (res.getValue() == 1.0f) { // Watering required
+                        if (this.rgbColorCommand.equals("#00FF00")) this.rgbColorCommand = "#FFFFFF"; // WHITE
+                        this.motorStatus = true;
+                    }
+                    break;
+                case "CO2Strategy":
+                    if (res.getValue() == 1.0f) { // Ventilation required
+                        if (this.rgbColorCommand.equals("#00FF00")) this.rgbColorCommand = "#FFC0CB"; // PINK
+                        this.fanStatus = true;
+                        if (!alarmMuted) this.buzzerStatus = true;
+                    }
+                    break;
+                case "LightStrategy":
+                    if (res.getValue() > 0) { // Light deficit
+                        if (this.rgbColorCommand.equals("#00FF00")) this.rgbColorCommand = "#FFFF00"; // YELLOW
+                        this.ledIntensityCommand = 80;
+                    }
+                    break;
+            }
         }
     }
 
     private void resetActuators() {
         this.fanStatus = false;
-        this.buzzerStatus = false;
+        if (!this.alarmMuted) this.buzzerStatus = false;
         this.motorStatus = false;
         this.resistorStatus = false;
-        this.rgbColorCommand = "#00FF00"; // GREEN [3]
+        this.rgbColorCommand = "#00FF00";
         this.ledIntensityCommand = 0;
     }
 
-    // --- SETTERS ---
-    public void setRGBCommand(String color) { this.rgbColorCommand = color; }
-    public void setBuzzerCommand(boolean active) { this.buzzerStatus = active; }
-    public void setMotorCommand(boolean active) { this.motorStatus = active; }
-    public void setResistorCommand(boolean active) { this.resistorStatus = active; }
-    public void setFanCommand(boolean active) { this.fanStatus = active; }
-    public void setLEDStripCommand(int intensity) { this.ledIntensityCommand = intensity; }
-
-    // --- GETTERS ---
+    // --- GETTERS (Mantenemos los getters porque el ActuatorController los necesita) ---
     public boolean isFanStatus() { return fanStatus; }
     public boolean isBuzzerStatus() { return buzzerStatus; }
     public boolean isMotorStatus() { return motorStatus; }
@@ -131,5 +105,5 @@ public class HardwareAlarmObserver implements IObserver {
     public int getLedIntensityCommand() { return ledIntensityCommand; }
     public Integer getBasedOnMeasurementId() { return basedOnMeasurementId; }
     public LocalDateTime getTimestamp() { return timestamp; }
-    public boolean isAlarmMuted() {return !this.alarmEnabled;}
+    public boolean isAlarmMuted() { return alarmMuted; }
 }

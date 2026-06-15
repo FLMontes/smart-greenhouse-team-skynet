@@ -1,6 +1,7 @@
 package com.iot.controllers;
 
 import com.iot.models.dto.ActuatorStatus;
+import com.iot.observers.HardwareAlarmObserver;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -10,19 +11,26 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/api/actuators")
 public class ActuatorController {
 
-    // Endpoint: GET /api/actuators/status
-    @GetMapping("/status")
-    public ResponseEntity<ActuatorStatus> getStatus() {
-        // Por ahora devolvemos un estado mock/hardcodeado simulando el estado del invernadero.
-        ActuatorStatus mockStatus = new ActuatorStatus(
-                false,     // fanStatus
-                true,      // buzzerStatus
-                true,      // motorStatus
-                false,     // resistorStatus
-                "#00FF00", // rgbColorCommand
-                70         // ledIntensityCommand
-        );
+    private final HardwareAlarmObserver hardwareObserver;
 
-        return ResponseEntity.ok(mockStatus);
+    public ActuatorController(HardwareAlarmObserver hardwareObserver) {
+        this.hardwareObserver = hardwareObserver;
+    }
+
+    @GetMapping("/status")
+    public ResponseEntity<ActuatorStatus> getActuatorStatus() {
+        ActuatorStatus status = new ActuatorStatus();
+
+        status.setBasedOnMeasurementId(hardwareObserver.getBasedOnMeasurementId());
+        status.setTimestamp(hardwareObserver.getTimestamp());
+        status.setFanStatus(hardwareObserver.isFanStatus());
+        status.setBuzzerStatus(hardwareObserver.isBuzzerStatus());
+        status.setMotorStatus(hardwareObserver.isMotorStatus());
+        status.setResistorStatus(hardwareObserver.isResistorStatus());
+        status.setAlarmMuted(hardwareObserver.isAlarmMuted());
+        status.setRgbColorCommand(hardwareObserver.getRgbColorCommand());
+        status.setLedIntensityCommand(hardwareObserver.getLedIntensityCommand());
+
+        return ResponseEntity.ok(status);
     }
 }
