@@ -36,6 +36,10 @@ public class MeasurementController {
         m.setCo2(input.getCo2());
         m.setButtonPressed(input.getButtonPressed());
 
+        if (input.getSensorId() != null) {
+            m.setSensorId(input.getSensorId().toString());
+        }
+
         // Timestamp del servidor
         m.setTimestamp(LocalDateTime.now());
 

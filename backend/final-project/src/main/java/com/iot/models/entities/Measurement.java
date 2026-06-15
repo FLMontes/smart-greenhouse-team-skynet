@@ -23,6 +23,9 @@ public class Measurement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
+    @Column(name = "sensor_id", nullable = false)
+    private String sensorId;
+
     @Min(value = -10, message = "Temperature cannot be less than -10")
     @Max(value = 60, message = "Temperature cannot be greater than 60")
     private Float temperature;
