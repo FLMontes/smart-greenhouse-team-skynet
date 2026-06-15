@@ -35,7 +35,7 @@ public class HardwareAlarmObserver implements IObserver {
         newStatus.setRgbColorCommand("#00FF00"); // Verde por defecto
 
         // Lógica de Silencio (Mute)
-        boolean isMuted = m.isButtonPressed() != null && m.isButtonPressed();
+        boolean isMuted = m.getButtonPressed() != null && m.getButtonPressed();
 
         // 2. Le pedimos al Analizador los resultados procesados
         List<AlgorithmResult> results = analyzer.getLatestAlgorithmResults();
