@@ -1,7 +1,7 @@
 package com.iot.controllers;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.iot.models.dto.ErrorResponse;
+import com.iot.models.dto.ActuatorStatus;
+import com.iot.models.dto.MeasurementInput;
 import com.iot.models.entities.Measurement;
 import com.iot.repositories.IMeasurementRepository;
 import com.iot.services.EnvironmentalAnalyzer;
@@ -19,40 +19,29 @@ public class MeasurementController {
 
     private final EnvironmentalAnalyzer analyzer;
     private final IMeasurementRepository repository;
+    private final HardwareAlarmObserver hardwareObserver;
 
-    public MeasurementController(
-            EnvironmentalAnalyzer analyzer,
-            IMeasurementRepository repository) {
+    // Constructor-based dependency injection
+    public MeasurementController(EnvironmentalAnalyzer analyzer, IMeasurementRepository repository, HardwareAlarmObserver hardwareObserver) {
         this.analyzer = analyzer;
         this.repository = repository;
     }
 
     @PostMapping
-    public ResponseEntity<?> receiveMeasurement(@RequestBody String payload) {
-        if (!validatePayload(payload)) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse(
-                            "INVALID_REQUEST",
-                            "Invalid request payload.",
-                            LocalDateTime.now().toString()
-                    ));
-        }
+    public ResponseEntity<Measurement> receiveMeasurement(@Valid @RequestBody MeasurementInput input) {
+        Measurement m = new Measurement();
 
-        Measurement m;
-        try {
-            m = parseMeasurement(payload);
-        } catch (IOException ex) {
-            return ResponseEntity
-                    .status(HttpStatus.BAD_REQUEST)
-                    .body(new ErrorResponse(
-                            "INVALID_REQUEST",
-                            "Invalid request payload.",
-                            LocalDateTime.now().toString()
-                    ));
-        }
+        // Clean manual mapping
+        m.setTemperature(input.getTemperature());
+        m.setHumidity(input.getHumidity());
+        m.setLight(input.getLight());
+        m.setCo2(input.getCo2());
+        m.setButtonPressed(input.getButtonPressed());
 
+        // Server timestamp in UTC
         m.setTimestamp(LocalDateTime.now());
+
+        // Persist the new measurement to the database
         repository.save(m);
         analyzer.analyzeMeasurement(m);
 
