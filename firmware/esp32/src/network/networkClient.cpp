@@ -7,6 +7,7 @@
 
 auto constexpr WIFI_CONNECTION_TIMEOUT_MS = 15000UL;
 auto constexpr WIFI_RETRY_INTERVAL_MS = 10000UL;
+auto constexpr HTTP_REQUEST_TIMEOUT_MS = 5000;
 auto constexpr HTTP_STATUS_OK = 200;
 auto constexpr HTTP_STATUS_MULTIPLE_CHOICES = 300;
 
@@ -34,19 +35,19 @@ bool parseHexColor(const String& color, uint8_t& red, uint8_t& green, uint8_t& b
     return true;
 }
 
-uint8_t clampIntensity(int value)
+uint8_t percentToPwmIntensity(int percent)
 {
-    if (value < 0)
+    if (percent < 0)
     {
-        return 0;
+        percent = 0;
     }
 
-    if (value > 255)
+    if (percent > 100)
     {
-        return 255;
+        percent = 100;
     }
 
-    return static_cast<uint8_t>(value);
+    return static_cast<uint8_t>((percent * 255) / 100);
 }
 
 }  // namespace
@@ -106,9 +107,12 @@ bool NetworkClient::postSensorReading(const sensors::SensorReading& reading)
         return false;
     }
 
+    http.setTimeout(HTTP_REQUEST_TIMEOUT_MS);
     http.addHeader("Content-Type", "application/json");
 
     JsonDocument payload;
+    payload["deviceId"] = reading.deviceId;
+    payload["sensorId"] = reading.sensorId;
     payload["temperature"] = reading.temperature;
     payload["humidity"] = reading.humidity;
     payload["light"] = reading.light;
@@ -124,8 +128,7 @@ bool NetworkClient::postSensorReading(const sensors::SensorReading& reading)
 
     if (statusCode >= HTTP_STATUS_OK && statusCode < HTTP_STATUS_MULTIPLE_CHOICES)
     {
-        logMessage("Telemetry sent. temp=" + String(reading.temperature, 1) + "C humidity=" +
-                   String(reading.humidity, 1) + "%");
+        logMessage("Telemetry sent.");
         return true;
     }
 
@@ -161,6 +164,8 @@ ActuatorState NetworkClient::fetchActuatorState()
         logMessage("Could not open actuator status endpoint.");
         return nextState;
     }
+
+    http.setTimeout(HTTP_REQUEST_TIMEOUT_MS);
 
     const int statusCode = http.GET();
     const String responseBody = http.getString();
@@ -202,7 +207,7 @@ ActuatorState NetworkClient::fetchActuatorState()
     nextState.rgbRed = red;
     nextState.rgbGreen = green;
     nextState.rgbBlue = blue;
-    nextState.ledIntensity = clampIntensity((intensityPercent * 255) / 100);
+    nextState.ledIntensity = percentToPwmIntensity(intensityPercent);
 
     nextState.known = true;
     return nextState;
@@ -225,6 +230,7 @@ void NetworkClient::connectToWifi()
         delay(500);
         Serial.print('.');
     }
+
     Serial.println();
 
     if (isConnected())

@@ -1,8 +1,8 @@
 #ifndef FIRMWARE_ESP32_INCLUDE_SENSORS_SENSOR_SERVICE_HPP
 #define FIRMWARE_ESP32_INCLUDE_SENSORS_SENSOR_SERVICE_HPP
 
+#include <Adafruit_HTU21DF.h>
 #include <BH1750.h>
-#include <SparkFunHTU21D.h>
 #include <Wire.h>
 
 #include "appConfig.hpp"
@@ -20,9 +20,15 @@ public:
 
 private:
     const app::AppConfig& config_;
-    HTU21D htu21d_;
+    Adafruit_HTU21DF htu21d_;
     BH1750 bh1750_;
 
+    bool htu21dReady_;
+    bool bh1750Ready_;
+
+    float readTemperature();
+    float readHumidity();
+    float readLight();
     float readCo2Analog() const;
 };
 
