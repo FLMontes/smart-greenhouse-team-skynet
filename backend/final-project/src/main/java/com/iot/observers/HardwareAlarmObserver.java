@@ -36,7 +36,6 @@ public class HardwareAlarmObserver implements IObserver {
 
         // Lógica de Silencio (Mute)
         boolean isMuted = m.getButtonPressed() != null && m.getButtonPressed();
-
         // 2. Le pedimos al Analizador los resultados procesados
         List<AlgorithmResult> results = analyzer.getLatestAlgorithmResults();
 
