@@ -51,3 +51,46 @@ databaseChangeLog:
             columns:
               - column:
                   name: sensor_id
+  # =========================================================
+  #                       DISEÑO PROPIO
+  # =========================================================
+  - changeSet:
+      id: 2-create-measurements-table
+      author: skynet
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            tableExists:
+              tableName: measurements
+      changes:
+        - createTable:
+            tableName: measurements
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: temperature
+                  type: REAL
+              - column:
+                  name: humidity
+                  type: REAL
+              - column:
+                  name: light
+                  type: REAL
+              - column:
+                  name: co2
+                  type: REAL
+              - column:
+                  name: button_pressed
+                  type: BOOLEAN
+              - column:
+                  name: timestamp
+                  type: TIMESTAMPTZ
+                  defaultValueComputed: CURRENT_TIMESTAMP
+                  constraints:
+                    nullable: false

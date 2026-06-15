@@ -1,5 +1,6 @@
 package com.iot.controllers;
 
+import com.iot.models.dto.MeasurementInput;
 import com.iot.models.entities.Measurement;
 import com.iot.repositories.IMeasurementRepository;
 import com.iot.services.EnvironmentalAnalyzer;
@@ -18,32 +19,35 @@ public class MeasurementController {
     private final EnvironmentalAnalyzer analyzer;
     private final IMeasurementRepository repository;
 
-    // Constructor-based dependency injection
+    // Constructor Injection (¡La best practice que te elogiaron!)
     public MeasurementController(EnvironmentalAnalyzer analyzer, IMeasurementRepository repository) {
         this.analyzer = analyzer;
         this.repository = repository;
     }
 
-    // Fulfills the POST /api/measurements endpoint from the OpenAPI contract
     @PostMapping
-    public ResponseEntity<Measurement> receiveMeasurement(@Valid @RequestBody Measurement m) {
-        // Set the current timestamp before persisting the data
+    public ResponseEntity<Measurement> receiveMeasurement(@Valid @RequestBody MeasurementInput input) {
+        Measurement m = new Measurement();
+
+        // Mapeo manual limpio
+        m.setTemperature(input.getTemperature());
+        m.setHumidity(input.getHumidity());
+        m.setLight(input.getLight());
+        m.setCo2(input.getCo2());
+        m.setButtonPressed(input.getButtonPressed());
+
+        // Hora del servidor en UTC
         m.setTimestamp(LocalDateTime.now());
 
-        // Persist the new measurement to the PostgreSQL database
+        // Guardamos en la base y analizamos (T26)
         repository.save(m);
-
-        // Process the measurement through the configured algorithms and notify observers
         analyzer.analyzeMeasurement(m);
 
-        // Return HTTP 201 Created with the persisted measurement payload
         return ResponseEntity.status(HttpStatus.CREATED).body(m);
     }
 
-    // Fulfills the GET /api/measurements endpoint from the OpenAPI contract
     @GetMapping
     public ResponseEntity<List<Measurement>> getHistory() {
-        // Retrieve and return the historical measurements from the database
         return ResponseEntity.ok(repository.getHistory());
     }
 }
