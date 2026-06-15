@@ -17,4 +17,4 @@ bool SilenceButton::isPressed() const
     return digitalRead(pin_) == LOW;
 }
 
-}
+}  // namespace button

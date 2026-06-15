@@ -7,16 +7,13 @@ namespace network {
 
 struct ActuatorState {
     bool known;
-
     bool fanStatus;
     bool buzzerStatus;
     bool motorStatus;
     bool resistorStatus;
-
     uint8_t rgbRed;
     uint8_t rgbGreen;
     uint8_t rgbBlue;
-
     uint8_t ledIntensity;
 };
 
