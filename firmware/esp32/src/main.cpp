@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <Adafruit_NeoPixel.h>
 
 #include "appConfig.hpp"
 #include "button/silenceButton.hpp"
@@ -9,7 +8,6 @@
 
 auto constexpr SERIAL_BAUD_RATE = 115200;
 auto constexpr DELAY_BETWEEN_TASKS_MS = 100;
-auto constexpr LED_STRIP_PIXEL_COUNT = 8;
 
 namespace {
 
@@ -17,74 +15,77 @@ network::NetworkClient networkClient(app::CONFIG);
 sensors::SensorService sensorService(app::CONFIG);
 button::SilenceButton silenceButton(app::CONFIG.silenceButtonPin);
 
-Adafruit_NeoPixel ledStrip(
-    LED_STRIP_PIXEL_COUNT,
-    app::CONFIG.ledStripPin,
-    NEO_GRB + NEO_KHZ800
-);
-
 unsigned long lastTelemetryAt = 0;
-unsigned long lastActuatorPollAt = 0;
-network::ActuatorState currentActuatorState{false, false, false, false, false, 0, 0, 0, 0};
+unsigned long lastActuatorPollingAt = 0;
 
-void applyRgb(uint8_t red, uint8_t green, uint8_t blue)
-{
-    analogWrite(app::CONFIG.rgbRedPin, red);
-    analogWrite(app::CONFIG.rgbGreenPin, green);
-    analogWrite(app::CONFIG.rgbBluePin, blue);
-}
-
-void applyLedStrip(uint8_t red, uint8_t green, uint8_t blue, uint8_t intensity)
-{
-    ledStrip.setBrightness(intensity);
-
-    for (uint16_t i = 0; i < ledStrip.numPixels(); ++i)
-    {
-        ledStrip.setPixelColor(i, ledStrip.Color(red, green, blue));
-    }
-
-    ledStrip.show();
-}
-
-void applyDigitalOutput(uint8_t pin, bool enabled)
-{
-    digitalWrite(pin, enabled ? HIGH : LOW);
-}
-
-void applyActuatorState(const network::ActuatorState& actuatorState)
-{
-    applyRgb(actuatorState.rgbRed, actuatorState.rgbGreen, actuatorState.rgbBlue);
-
-    applyLedStrip(
-        actuatorState.rgbRed,
-        actuatorState.rgbGreen,
-        actuatorState.rgbBlue,
-        actuatorState.ledIntensity
-    );
-
-    applyDigitalOutput(app::CONFIG.fanPin, actuatorState.fanStatus);
-    applyDigitalOutput(app::CONFIG.resistorPin, actuatorState.resistorStatus);
-    applyDigitalOutput(app::CONFIG.motorPin, actuatorState.motorStatus);
-    applyDigitalOutput(app::CONFIG.buzzerPin, actuatorState.buzzerStatus);
-}
-
-void setupOutputPins()
+void configureOutputs()
 {
     pinMode(app::CONFIG.rgbRedPin, OUTPUT);
     pinMode(app::CONFIG.rgbGreenPin, OUTPUT);
     pinMode(app::CONFIG.rgbBluePin, OUTPUT);
 
+    pinMode(app::CONFIG.ledStripPin, OUTPUT);
     pinMode(app::CONFIG.fanPin, OUTPUT);
-    pinMode(app::CONFIG.resistorPin, OUTPUT);
-    pinMode(app::CONFIG.motorPin, OUTPUT);
+    pinMode(app::CONFIG.heaterPin, OUTPUT);
+    pinMode(app::CONFIG.pumpPin, OUTPUT);
     pinMode(app::CONFIG.buzzerPin, OUTPUT);
+}
 
-    applyRgb(0, 0, 0);
+void turnOffOutputs()
+{
+    digitalWrite(app::CONFIG.rgbRedPin, LOW);
+    digitalWrite(app::CONFIG.rgbGreenPin, LOW);
+    digitalWrite(app::CONFIG.rgbBluePin, LOW);
 
+    digitalWrite(app::CONFIG.ledStripPin, LOW);
     digitalWrite(app::CONFIG.fanPin, LOW);
-    digitalWrite(app::CONFIG.resistorPin, LOW);
-    digitalWrite(app::CONFIG.motorPin, LOW);
+    digitalWrite(app::CONFIG.heaterPin, LOW);
+    digitalWrite(app::CONFIG.pumpPin, LOW);
     digitalWrite(app::CONFIG.buzzerPin, LOW);
+}
+
+void applyRgbCommand(uint8_t red, uint8_t green, uint8_t blue)
+{
+    digitalWrite(app::CONFIG.rgbRedPin, red > 0 ? HIGH : LOW);
+    digitalWrite(app::CONFIG.rgbGreenPin, green > 0 ? HIGH : LOW);
+    digitalWrite(app::CONFIG.rgbBluePin, blue > 0 ? HIGH : LOW);
+}
+
+void applyLightCommand(uint8_t ledIntensity)
+{
+    // Current demo hardware uses the lighting output as ON/OFF.
+    // Any non-zero intensity command turns the lighting output on.
+    digitalWrite(app::CONFIG.ledStripPin, ledIntensity > 0 ? HIGH : LOW);
+}
+
+void applyActuatorState(const network::ActuatorState& actuatorState)
+{
+    if (!actuatorState.known)
+    {
+        Serial.println("ESP32: Actuator state unknown. Outputs were not updated.");
+        return;
+    }
+
+    digitalWrite(app::CONFIG.fanPin, actuatorState.fanStatus ? HIGH : LOW);
+    digitalWrite(app::CONFIG.heaterPin, actuatorState.resistorStatus ? HIGH : LOW);
+    digitalWrite(app::CONFIG.pumpPin, actuatorState.motorStatus ? HIGH : LOW);
+    digitalWrite(app::CONFIG.buzzerPin, actuatorState.buzzerStatus ? HIGH : LOW);
+
+    applyRgbCommand(
+        actuatorState.rgbRed,
+        actuatorState.rgbGreen,
+        actuatorState.rgbBlue
+    );
+
+    applyLightCommand(actuatorState.ledIntensity);
+
+    Serial.println(
+        String("ESP32: Actuators updated. fan=") + String(actuatorState.fanStatus) +
+        " heater=" + String(actuatorState.resistorStatus) +
+        " pump=" + String(actuatorState.motorStatus) +
+        " buzzer=" + String(actuatorState.buzzerStatus) +
+        " ledIntensity=" + String(static_cast<int>(actuatorState.ledIntensity))
+    );
 }
 
 void handleTelemetryTask()
@@ -95,89 +96,79 @@ void handleTelemetryTask()
     }
 
     lastTelemetryAt = millis();
+
+    sensors::SensorReading reading = sensorService.read();
+    reading.buttonPressed = silenceButton.isPressed();
+
+    Serial.println(
+        String("ESP32: Sensors read. temp=") + String(reading.temperature, 1) +
+        " humidity=" + String(reading.humidity, 1) +
+        " light=" + String(reading.light, 1) +
+        " co2=" + String(reading.co2, 0) +
+        " buttonPressed=" + String(reading.buttonPressed)
+    );
+
     networkClient.ensureWifiConnection();
 
     if (!networkClient.isConnected())
     {
-        Serial.println("ESP32: Skipping telemetry because Wi-Fi is offline.");
+        Serial.println("ESP32: Skipping telemetry because Wi-Fi is disconnected.");
         return;
     }
 
-    const sensors::SensorReading reading = sensorService.read();
-    networkClient.postSensorReading(reading);
+    if (networkClient.postSensorReading(reading))
+    {
+        Serial.println("ESP32: Measurement sent successfully.");
+    }
+    else
+    {
+        Serial.println("ESP32: Failed to send measurement.");
+    }
 }
 
 void handleActuatorPollingTask()
 {
-    if (millis() - lastActuatorPollAt < app::CONFIG.actuatorPollIntervalMs)
+    if (millis() - lastActuatorPollingAt < app::CONFIG.actuatorPollingIntervalMs)
     {
         return;
     }
 
-    lastActuatorPollAt = millis();
+    lastActuatorPollingAt = millis();
+
     networkClient.ensureWifiConnection();
 
     if (!networkClient.isConnected())
     {
-        Serial.println("ESP32: Skipping actuator polling because Wi-Fi is offline.");
+        Serial.println("ESP32: Skipping actuator polling because Wi-Fi is disconnected.");
         return;
     }
 
-    const network::ActuatorState nextState = networkClient.fetchActuatorState();
-    if (!nextState.known)
-    {
-        return;
-    }
-
-    applyActuatorState(nextState);
-    currentActuatorState = nextState;
-
-    Serial.println(
-        String("ESP32: Actuators updated. RGB=(") +
-        String(nextState.rgbRed) + "," +
-        String(nextState.rgbGreen) + "," +
-        String(nextState.rgbBlue) + "), strip brightness=" +
-        String(nextState.ledIntensity) +
-        ", fan=" +
-        String(nextState.fanStatus ? "ON" : "OFF") +
-        ", heater=" +
-        String(nextState.resistorStatus ? "ON" : "OFF") +
-        ", pump=" +
-        String(nextState.motorStatus ? "ON" : "OFF") +
-        ", buzzer=" +
-        String(nextState.buzzerStatus ? "ON" : "OFF")
-    );
+    const network::ActuatorState actuatorState = networkClient.fetchActuatorState();
+    applyActuatorState(actuatorState);
 }
 
-}  // namespace
+} // namespace
 
 void setup()
 {
     Serial.begin(SERIAL_BAUD_RATE);
-
-    delay(DELAY_BETWEEN_TASKS_MS * 10);
-    Serial.println("[ESP32] Booting firmware...");
-
-    setupOutputPins();
-
-    ledStrip.begin();
-    ledStrip.clear();
-    ledStrip.show();
+    delay(500);
 
     silenceButton.begin();
     sensorService.begin();
+
+    configureOutputs();
+    turnOffOutputs();
+
     networkClient.begin();
+
+    Serial.println("ESP32: Firmware initialized.");
 }
 
 void loop()
 {
     handleTelemetryTask();
     handleActuatorPollingTask();
-
-    if (silenceButton.isPressed())
-    {
-        Serial.println("[ESP32] Alarm silence requested");
-    }
 
     delay(DELAY_BETWEEN_TASKS_MS);
 }
