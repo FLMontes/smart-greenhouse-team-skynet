@@ -16,7 +16,7 @@ public class Measurement {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; // ¡MAGIA ACÁ! Ahora es Integer para que coincida con Postgres
+    private Integer id;
 
     @Min(value = -10, message = "Temperature cannot be less than -10")
     @Max(value = 60, message = "Temperature cannot be greater than 60")
