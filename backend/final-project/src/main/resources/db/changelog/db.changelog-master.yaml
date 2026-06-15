@@ -51,3 +51,29 @@ databaseChangeLog:
             columns:
               - column:
                   name: sensor_id
+
+  - changeSet:
+      id: 2-add-missing-sensor-columns
+      author: iot-team
+      changes:
+        - addColumn:
+            tableName: sensor_readings
+            columns:
+              - column:
+                  name: light
+                  type: DOUBLE PRECISION
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: co2
+                  type: DOUBLE PRECISION
+                  defaultValueNumeric: 0
+                  constraints:
+                    nullable: false
+              - column:
+                  name: button_pressed
+                  type: BOOLEAN
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
