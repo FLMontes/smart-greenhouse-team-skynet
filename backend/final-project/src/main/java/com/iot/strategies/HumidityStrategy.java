@@ -1,7 +1,9 @@
 package com.iot.strategies;
 
 import com.iot.models.entities.Measurement;
+import org.springframework.stereotype.Component;
 
+@Component
 public class HumidityStrategy implements IAlgorithmStrategy {
 
     private static final float DEFAULT_MIN_HUMIDITY = 40.0f;

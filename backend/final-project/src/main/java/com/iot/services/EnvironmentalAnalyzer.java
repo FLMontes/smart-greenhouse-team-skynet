@@ -5,6 +5,7 @@ import com.iot.observers.IObserver;
 import com.iot.repositories.IMeasurementRepository;
 import org.springframework.stereotype.Service;
 import com.iot.strategies.IAlgorithmStrategy;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,12 +13,18 @@ import java.util.List;
 public class EnvironmentalAnalyzer {
 
     private Measurement currentMeasurement;
-    private List<IAlgorithmStrategy> strategies;
-    private List<IObserver> observers;
-    private IMeasurementRepository repository;
 
-    public EnvironmentalAnalyzer() {
-        this.strategies = new ArrayList<>();
+    // Using 'final' ensures these are injected and never null
+    private final List<IAlgorithmStrategy> strategies;
+    private final List<IObserver> observers;
+    private final IMeasurementRepository repository;
+
+    // --- CONSTRUCTOR INJECTION ---
+    // Spring Boot automatically finds the Repository and ALL your @Component Strategies
+    // and injects them here perfectly assembled!
+    public EnvironmentalAnalyzer(List<IAlgorithmStrategy> strategies, IMeasurementRepository repository) {
+        this.strategies = strategies;
+        this.repository = repository;
         this.observers = new ArrayList<>();
     }
 
@@ -47,28 +54,18 @@ public class EnvironmentalAnalyzer {
     public void analyzeMeasurement(Measurement m) {
         this.currentMeasurement = m;
 
-        //process the measurement using all defined algorithm strategies
+        // Process the measurement using all defined algorithm strategies
         if (this.strategies != null) {
             for (IAlgorithmStrategy strategy : this.strategies) {
                 strategy.process(m);
             }
         }
 
-        //notify observers (like HardwareAlarmObserver or WebDashboardObserver)
+        // Notify observers (like HardwareAlarmObserver)
         notifyObservers();
     }
 
-    /**
-     * @param strategies List of algorithm strategies.
-     */
-    public void setStrategies(List<IAlgorithmStrategy> strategies) {
-        this.strategies = strategies;
-    }
-
-    /**
-     * @param repository The repository implementation.
-     */
-    public void setRepository(IMeasurementRepository repository) {
-        this.repository = repository;
+    public Measurement getCurrentMeasurement() {
+        return this.currentMeasurement;
     }
 }

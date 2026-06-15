@@ -1,9 +1,12 @@
 package com.iot.strategies;
 
 import com.iot.models.entities.Measurement;
+import org.springframework.stereotype.Component;
+
 import java.util.ArrayDeque;
 import java.util.Deque;
 
+@Component
 public class MovingAverageStrategy implements IAlgorithmStrategy {
 
     private static final int DEFAULT_WINDOW_SIZE = 5;

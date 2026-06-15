@@ -1,7 +1,9 @@
 package com.iot.strategies;
 
+import org.springframework.stereotype.Component;
 import com.iot.models.entities.Measurement;
 
+@Component
 public class CO2Strategy implements IAlgorithmStrategy {
 
     private static final float MIN_ALLOWED_CO2 = 0.0f;
@@ -9,6 +11,12 @@ public class CO2Strategy implements IAlgorithmStrategy {
 
     private float maxCO2;
     private boolean ventilationRequired;
+
+    // Default constructor required by Spring Boot
+    public CO2Strategy() {
+        // Set a default CO2 threshold (e.g., 1000 ppm is a common warning level)
+        this(1000.0f);
+    }
 
     public CO2Strategy(float maxCO2) {
         setMaxCO2(maxCO2);
@@ -18,7 +26,7 @@ public class CO2Strategy implements IAlgorithmStrategy {
     public void process(Measurement measurement) {
         if (measurement == null) {
             throw new IllegalArgumentException(
-                "Measurement must not be null"
+                    "Measurement must not be null"
             );
         }
 
@@ -45,11 +53,11 @@ public class CO2Strategy implements IAlgorithmStrategy {
 
     private void validateCO2(float co2) {
         if (!Float.isFinite(co2)
-            || co2 < MIN_ALLOWED_CO2
-            || co2 > MAX_ALLOWED_CO2) {
+                || co2 < MIN_ALLOWED_CO2
+                || co2 > MAX_ALLOWED_CO2) {
 
             throw new IllegalArgumentException(
-                "CO2 must be between 0 and 5000"
+                    "CO2 must be between 0 and 5000"
             );
         }
     }

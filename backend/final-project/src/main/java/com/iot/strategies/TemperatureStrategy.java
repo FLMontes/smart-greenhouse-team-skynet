@@ -1,7 +1,9 @@
 package com.iot.strategies;
 
+import org.springframework.stereotype.Component;
 import com.iot.models.entities.Measurement;
 
+@Component
 public class TemperatureStrategy implements IAlgorithmStrategy {
 
     private static final float DEFAULT_MIN_TEMPERATURE = 15.0f;
