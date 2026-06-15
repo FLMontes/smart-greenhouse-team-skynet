@@ -1,11 +1,10 @@
 #ifndef FIRMWARE_ESP32_INCLUDE_SENSORS_SENSOR_SERVICE_HPP
 #define FIRMWARE_ESP32_INCLUDE_SENSORS_SENSOR_SERVICE_HPP
 
-#include <Adafruit_HTU21DF.h>
-#include <BH1750.h>
-#include <Wire.h>
+#include <memory>
 
 #include "appConfig.hpp"
+#include "sensors/sensorFactory.hpp"
 #include "sensors/sensorTypes.hpp"
 
 namespace sensors {
@@ -20,16 +19,12 @@ public:
 
 private:
     const app::AppConfig& config_;
-    Adafruit_HTU21DF htu21d_;
-    BH1750 bh1750_;
+    SensorFactory sensorFactory_;
 
-    bool htu21dReady_;
-    bool bh1750Ready_;
-
-    float readTemperature();
-    float readHumidity();
-    float readLight();
-    float readCo2Analog() const;
+    std::unique_ptr<Sensor> temperatureHumiditySensor_;
+    std::unique_ptr<Sensor> lightSensor_;
+    std::unique_ptr<Sensor> co2Sensor_;
+    std::unique_ptr<Sensor> buttonSensor_;
 };
 
 }  // namespace sensors

@@ -1,7 +1,6 @@
 #include <Arduino.h>
 
 #include "appConfig.hpp"
-#include "button/silenceButton.hpp"
 #include "network/networkClient.hpp"
 #include "network/networkTypes.hpp"
 #include "sensors/sensorService.hpp"
@@ -13,7 +12,6 @@ namespace {
 
 network::NetworkClient networkClient(app::CONFIG);
 sensors::SensorService sensorService(app::CONFIG);
-button::SilenceButton silenceButton(app::CONFIG.silenceButtonPin);
 
 unsigned long lastTelemetryAt = 0;
 unsigned long lastActuatorPollingAt = 0;
@@ -98,7 +96,6 @@ void handleTelemetryTask()
     lastTelemetryAt = millis();
 
     sensors::SensorReading reading = sensorService.read();
-    reading.buttonPressed = silenceButton.isPressed();
 
     Serial.println(
         String("ESP32: Sensors read. temp=") + String(reading.temperature, 1) +
@@ -154,7 +151,6 @@ void setup()
     Serial.begin(SERIAL_BAUD_RATE);
     delay(500);
 
-    silenceButton.begin();
     sensorService.begin();
 
     configureOutputs();

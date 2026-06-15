@@ -19,7 +19,6 @@ public class MeasurementController {
 
     private final EnvironmentalAnalyzer analyzer;
     private final IMeasurementRepository repository;
-    private final HardwareAlarmObserver hardwareObserver;
 
     public MeasurementController(EnvironmentalAnalyzer analyzer, IMeasurementRepository repository) {
         this.analyzer = analyzer;
