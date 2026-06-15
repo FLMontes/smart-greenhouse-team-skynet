@@ -9,6 +9,9 @@ describe("formatSensorReading", () => {
       sensorId: "sensor-01",
       temperature: 23.456,
       humidity: 61.2,
+      light: 15000,
+      co2: 450,
+      buttonPressed: false,
       createdAt: "2026-06-04T14:30:00Z",
     };
 
