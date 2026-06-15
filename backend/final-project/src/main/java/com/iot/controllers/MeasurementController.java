@@ -1,102 +1,118 @@
 package com.iot.controllers;
 
-
-import com.iot.models.dto.ActuatorStatus;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.iot.models.dto.ErrorResponse;
 import com.iot.models.entities.Measurement;
-import com.iot.observers.HardwareAlarmObserver;
 import com.iot.repositories.IMeasurementRepository;
 import com.iot.services.EnvironmentalAnalyzer;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
-
 
 @RestController
 @RequestMapping("/api/measurements")
 public class MeasurementController {
 
-
     private final EnvironmentalAnalyzer analyzer;
     private final IMeasurementRepository repository;
 
-
-    // NEW: Injecting the observer to read the hardware status
-    private final HardwareAlarmObserver hardwareObserver;
-
-
-    // Constructor-based dependency injection
     public MeasurementController(
             EnvironmentalAnalyzer analyzer,
-            IMeasurementRepository repository,
-            HardwareAlarmObserver hardwareObserver) {
+            IMeasurementRepository repository) {
         this.analyzer = analyzer;
         this.repository = repository;
-        this.hardwareObserver = hardwareObserver;
     }
 
-
-    // Fulfills the POST /api/measurements endpoint from the OpenAPI contract
     @PostMapping
-    public ResponseEntity<Measurement> receiveMeasurement(@Valid @RequestBody Measurement m) {
+    public ResponseEntity<?> receiveMeasurement(@RequestBody String payload) {
+        if (!validatePayload(payload)) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(
+                            "INVALID_REQUEST",
+                            "Invalid request payload.",
+                            LocalDateTime.now().toString()
+                    ));
+        }
+
+        Measurement m;
+        try {
+            m = parseMeasurement(payload);
+        } catch (IOException ex) {
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(new ErrorResponse(
+                            "INVALID_REQUEST",
+                            "Invalid request payload.",
+                            LocalDateTime.now().toString()
+                    ));
+        }
+
         m.setTimestamp(LocalDateTime.now());
-
-
-        // Persist the new measurement to the database
         repository.save(m);
-
-
-        // Process the measurement through the configured algorithms and notify observers
         analyzer.analyzeMeasurement(m);
 
-
-        // Return HTTP 201 Created
         return ResponseEntity.status(HttpStatus.CREATED).body(m);
     }
 
-
-    // Fulfills the GET /api/measurements endpoint from the OpenAPI contract
     @GetMapping
-    public ResponseEntity<List<Measurement>> getHistory() {
-        return ResponseEntity.ok(repository.getHistory());
+    public ResponseEntity<List<Measurement>> getHistory(
+            @RequestParam(defaultValue = "100") int limit,
+            @RequestParam(defaultValue = "0") int offset) {
+
+        int safeOffset = Math.max(0, offset);
+        int safeLimit = Math.min(1000, Math.max(1, limit));
+
+        // SOLUCIÓN ERROR 1: Le pasamos limit y offset al repositorio
+        List<Measurement> history = repository.getHistory(safeLimit, safeOffset);
+
+        return ResponseEntity.ok(history);
     }
 
-
-    // NEW: Endpoint for the WebDashboardObserver to fetch the latest data
     @GetMapping("/latest")
-    public ResponseEntity<Measurement> getLatestMeasurement() {
-        Measurement m = analyzer.getCurrentMeasurement();
-        if (m == null) {
-            return ResponseEntity.noContent().build();
+    public ResponseEntity<?> getLatestMeasurement() {
+
+        // SOLUCIÓN ERROR 2: Usamos el método que creamos para traer solo la última
+        Measurement latest = repository.getLatest();
+
+        if (latest == null) {
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse(
+                            "NOT_FOUND",
+                            "No measurements found.",
+                            LocalDateTime.now().toString()
+                    ));
         }
-        return ResponseEntity.ok(m);
+        return ResponseEntity.ok(latest);
     }
 
+    private boolean validatePayload(String payload) {
+        try {
+            Measurement measurement = parseMeasurement(payload);
+            return measurement.getTemperature() != null
+                    && measurement.getTemperature() >= -10
+                    && measurement.getTemperature() <= 60
+                    && measurement.getHumidity() != null
+                    && measurement.getHumidity() >= 0
+                    && measurement.getHumidity() <= 100
+                    && measurement.getLight() != null
+                    && measurement.getLight() >= 0
+                    && measurement.getLight() <= 100000
+                    && measurement.getCo2() != null
+                    && measurement.getCo2() >= 0
+                    && measurement.getCo2() <= 5000
+                    && measurement.isButtonPressed() != null;
+        } catch (IOException ex) {
+            return false;
+        }
+    }
 
-    // NEW: Endpoint to expose the hardware actuators status.
-    // This will solve all the "never used" yellow warnings in ActuatorStatus!
-    @GetMapping("/actuators/status")
-    public ResponseEntity<ActuatorStatus> getActuatorStatus() {
-        ActuatorStatus status = new ActuatorStatus();
-
-
-        // We use the setters here. Spring Boot (Jackson) will automatically
-        // use the getters when converting this object to JSON!
-        status.setBasedOnMeasurementId(hardwareObserver.getBasedOnMeasurementId());
-        status.setTimestamp(hardwareObserver.getTimestamp());
-        status.setFanStatus(hardwareObserver.isFanStatus());
-        status.setBuzzerStatus(hardwareObserver.isBuzzerStatus());
-        status.setMotorStatus(hardwareObserver.isMotorStatus());
-        status.setResistorStatus(hardwareObserver.isResistorStatus());
-        status.setAlarmMuted(hardwareObserver.isAlarmMuted());
-        status.setRgbColorCommand(hardwareObserver.getRgbColorCommand());
-        status.setLedIntensityCommand(hardwareObserver.getLedIntensityCommand());
-
-
-        return ResponseEntity.ok(status);
+    private Measurement parseMeasurement(String payload) throws IOException {
+        return new ObjectMapper().readValue(payload, Measurement.class);
     }
 }

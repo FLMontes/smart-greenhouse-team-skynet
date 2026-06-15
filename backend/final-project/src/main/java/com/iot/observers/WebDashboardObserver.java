@@ -28,7 +28,6 @@ public class WebDashboardObserver implements IObserver {
         if (m == null) return;
 
         try {
-            // ¡Magia! Convierte toda la medición a un JSON perfecto automáticamente
             this.lastPayload = objectMapper.writeValueAsString(m);
             sendToFrontend();
         } catch (Exception e) {

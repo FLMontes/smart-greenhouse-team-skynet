@@ -1,69 +1,44 @@
 package com.iot.strategies;
 
-import com.iot.models.entities.Measurement;
 import org.springframework.stereotype.Component;
+import com.iot.models.dto.AnalysisContext;
+import com.iot.models.dto.AlgorithmResult;
+import java.time.LocalDateTime;
 
-// The @Component annotation allows Spring Boot to inject this strategy
 @Component
 public class LightStrategy implements IAlgorithmStrategy {
 
-    private static final float MIN_ALLOWED_LIGHT = 0.0f;
-    private static final float MAX_ALLOWED_LIGHT = 100000.0f;
-
+    private static final float DEFAULT_TARGET_LIGHT = 500.0f;
     private float targetLightLevel;
-    private float lightDeficit;
 
-    // Default constructor required by Spring Boot
     public LightStrategy() {
-        // Set a default target light level (e.g., 500 lux for standard indoor lighting)
-        this(500.0f);
-    }
-
-    public LightStrategy(float targetLightLevel) {
-        setTargetLightLevel(targetLightLevel);
+        this.targetLightLevel = DEFAULT_TARGET_LIGHT;
     }
 
     @Override
-    public void process(Measurement measurement) {
-        if (measurement == null) {
-            throw new IllegalArgumentException(
-                    "Measurement must not be null"
-            );
+    public AlgorithmResult process(AnalysisContext context) {
+        if (context == null || context.getAveragedMeasurement() == null) {
+            throw new IllegalArgumentException("AnalysisContext must not be null");
         }
 
-        evaluate(measurement.getLight());
-    }
+        // 1. Tomamos la luz promediada
+        float avgLight = context.getAveragedMeasurement().getLight();
 
-    public void evaluate(float lightLevel) {
-        validateLightLevel(lightLevel);
+        // 2. Calculamos el déficit de luz real
+        float lightDeficit = Math.max(0.0f, targetLightLevel - avgLight);
 
-        lightDeficit = Math.max(
-                0.0f,
-                targetLightLevel - lightLevel
+        return new AlgorithmResult(
+                "LightStrategy",
+                "Calculates light deficit to control LED strip intensity.",
+                "PostgreSQL measurements table",
+                "Last " + context.getSourceMeasurements().size() + " stored measurements",
+                "lightDeficit",
+                lightDeficit,
+                "lux",
+                LocalDateTime.now()
         );
     }
 
-    public float getLightDeficit() {
-        return lightDeficit;
-    }
-
-    public float getTargetLightLevel() {
-        return targetLightLevel;
-    }
-
-    public void setTargetLightLevel(float targetLightLevel) {
-        validateLightLevel(targetLightLevel);
-        this.targetLightLevel = targetLightLevel;
-    }
-
-    private void validateLightLevel(float lightLevel) {
-        if (!Float.isFinite(lightLevel)
-                || lightLevel < MIN_ALLOWED_LIGHT
-                || lightLevel > MAX_ALLOWED_LIGHT) {
-
-            throw new IllegalArgumentException(
-                    "Light level must be between 0 and 100000"
-            );
-        }
-    }
+    public float getTargetLightLevel() { return targetLightLevel; }
+    public void setTargetLightLevel(float targetLightLevel) { this.targetLightLevel = targetLightLevel; }
 }
