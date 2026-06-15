@@ -1,64 +1,44 @@
 package com.iot.strategies;
 
 import org.springframework.stereotype.Component;
-import com.iot.models.entities.Measurement;
+import com.iot.models.dto.AnalysisContext;
+import com.iot.models.dto.AlgorithmResult;
+import java.time.LocalDateTime;
 
 @Component
 public class CO2Strategy implements IAlgorithmStrategy {
 
-    private static final float MIN_ALLOWED_CO2 = 0.0f;
-    private static final float MAX_ALLOWED_CO2 = 5000.0f;
-
+    private static final float DEFAULT_MAX_CO2 = 1000.0f;
     private float maxCO2;
-    private boolean ventilationRequired;
 
-    // Default constructor required by Spring Boot
     public CO2Strategy() {
-        // Set a default CO2 threshold (e.g., 1000 ppm is a common warning level)
-        this(1000.0f);
-    }
-
-    public CO2Strategy(float maxCO2) {
-        setMaxCO2(maxCO2);
+        this.maxCO2 = DEFAULT_MAX_CO2;
     }
 
     @Override
-    public void process(Measurement measurement) {
-        if (measurement == null) {
-            throw new IllegalArgumentException(
-                    "Measurement must not be null"
-            );
+    public AlgorithmResult process(AnalysisContext context) {
+        if (context == null || context.getAveragedMeasurement() == null) {
+            throw new IllegalArgumentException("AnalysisContext must not be null");
         }
 
-        evaluate(measurement.getCo2());
+        // 1. Tomamos el CO2 promediado
+        float avgCo2 = context.getAveragedMeasurement().getCo2();
+
+        // 2. Evaluamos si necesita ventilación (1.0 = Sí, 0.0 = No)
+        float statusValue = (avgCo2 > maxCO2) ? 1.0f : 0.0f;
+
+        return new AlgorithmResult(
+                "CO2Strategy",
+                "Evaluates CO2 concentration to determine ventilation needs.",
+                "PostgreSQL measurements table",
+                "Last " + context.getSourceMeasurements().size() + " stored measurements",
+                "ventilationRequired",
+                statusValue,
+                "boolean",
+                LocalDateTime.now()
+        );
     }
 
-    public void evaluate(float co2) {
-        validateCO2(co2);
-        ventilationRequired = co2 > maxCO2;
-    }
-
-    public boolean isVentilationRequired() {
-        return ventilationRequired;
-    }
-
-    public float getMaxCO2() {
-        return maxCO2;
-    }
-
-    public void setMaxCO2(float maxCO2) {
-        validateCO2(maxCO2);
-        this.maxCO2 = maxCO2;
-    }
-
-    private void validateCO2(float co2) {
-        if (!Float.isFinite(co2)
-                || co2 < MIN_ALLOWED_CO2
-                || co2 > MAX_ALLOWED_CO2) {
-
-            throw new IllegalArgumentException(
-                    "CO2 must be between 0 and 5000"
-            );
-        }
-    }
+    public float getMaxCO2() { return maxCO2; }
+    public void setMaxCO2(float maxCO2) { this.maxCO2 = maxCO2; }
 }
