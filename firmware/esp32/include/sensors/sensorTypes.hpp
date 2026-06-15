@@ -6,16 +6,18 @@
 namespace sensors {
 
 /**
- * @brief Normalized sensor payload sent by the device.
+ * @brief Sensor payload sent by the ESP32 to the backend.
  *
- * This structure represents a single telemetry sample ready to be
- * serialized and published to the backend service.
+ * CO2 is currently sent as the raw MQ-135 ADC value.
  */
 struct SensorReading {
-  String deviceId;
-  String sensorId;
-  float temperature;
-  float humidity;
+    String deviceId;
+    String sensorId;
+    float temperature;
+    float humidity;
+    float co2;
+    float light;
+    bool buttonPressed;
 };
 
 }  // namespace sensors

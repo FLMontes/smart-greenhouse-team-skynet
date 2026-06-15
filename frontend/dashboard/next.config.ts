@@ -10,6 +10,9 @@ loadEnvConfig(monorepoRoot);
 const nextConfig: NextConfig = {
   // Required for the production image in `docker/nextjs.Dockerfile` (standalone server bundle).
   output: "standalone",
+  turbopack: {
+    root: __dirname,
+  },
 };
 
 export default nextConfig;

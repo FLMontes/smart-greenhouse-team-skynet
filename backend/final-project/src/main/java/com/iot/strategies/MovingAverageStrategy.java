@@ -1,15 +1,40 @@
 package com.iot.strategies;
 
-public class MovingAverageStrategy {
+import org.springframework.stereotype.Component;
+import com.iot.models.dto.AnalysisContext;
+import com.iot.models.dto.AlgorithmResult;
+import com.iot.models.entities.Measurement;
+import java.time.LocalDateTime;
+import java.util.List;
 
-    public double calculate(double[] values) {
+@Component
+public class MovingAverageStrategy implements IAlgorithmStrategy {
 
-        double sum = 0;
-
-        for(double value : values) {
-            sum += value;
+    @Override
+    public AlgorithmResult process(AnalysisContext context) {
+        if (context == null || context.getSourceMeasurements() == null) {
+            throw new IllegalArgumentException("AnalysisContext must not be null");
         }
 
-        return sum / values.length;
+        List<Measurement> history = context.getSourceMeasurements();
+        double sum = 0;
+
+        // Calculamos el promedio de temperatura basado en las mediciones de la base de datos
+        for (Measurement m : history) {
+            sum += m.getTemperature();
+        }
+
+        float average = history.isEmpty() ? 0.0f : (float) (sum / history.size());
+
+        return new AlgorithmResult(
+                "MovingAverageStrategy",
+                "Calculates the moving average of temperature using a sliding window.",
+                "PostgreSQL measurements table",
+                "Last " + history.size() + " stored measurements",
+                "averageTemperature",
+                average,
+                "°C",
+                LocalDateTime.now()
+        );
     }
 }
