@@ -9,9 +9,14 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import java.time.LocalDateTime;
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 @Entity
 @Table(name = "sensor_readings")
+
 public class Measurement {
 
     @Id
@@ -39,22 +44,4 @@ public class Measurement {
 
     @Column(name = "button_pressed")
     private Boolean buttonPressed;
-
-    // --- GETTERS ---
-    public Integer getId() { return id; }
-    public Float getTemperature() { return temperature; }
-    public Float getHumidity() { return humidity; }
-    public Float getLight() { return light; }
-    public Float getCo2() { return co2; }
-    public LocalDateTime getTimestamp() { return timestamp; }
-    public Boolean isButtonPressed() { return buttonPressed; }
-
-    // --- SETTERS ---
-    public void setId(Integer id) { this.id = id; }
-    public void setTemperature(Float temperature) { this.temperature = temperature; }
-    public void setHumidity(Float humidity) { this.humidity = humidity; }
-    public void setLight(Float light) { this.light = light; }
-    public void setCo2(Float co2) { this.co2 = co2; }
-    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
-    public void setButtonPressed(Boolean buttonPressed) { this.buttonPressed = buttonPressed; }
 }
