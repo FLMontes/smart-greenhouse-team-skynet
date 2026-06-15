@@ -1,28 +1,23 @@
 package com.iot.observers;
 
+import com.iot.models.dto.ActuatorStatus;
 import com.iot.models.dto.AlgorithmResult;
+import com.iot.models.entities.Measurement;
 import com.iot.services.EnvironmentalAnalyzer;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Component
 public class HardwareAlarmObserver implements IObserver {
 
-    private boolean fanStatus;
-    private boolean buzzerStatus;
-    private boolean motorStatus;
-    private boolean resistorStatus;
-    private String rgbColorCommand = "#00FF00"; // GREEN
-    private int ledIntensityCommand;
-    private Integer basedOnMeasurementId;
-    private LocalDateTime timestamp;
-    private boolean alarmMuted = false;
-
     private final EnvironmentalAnalyzer analyzer;
 
-    // Fíjate que ya no inyectamos las estrategias aquí. ¡Código mucho más limpio!
+    // NUEVO: La "caja fuerte" que guarda el último estado de los actuadores de forma segura.
+    private final AtomicReference<ActuatorStatus> currentStatus = new AtomicReference<>(new ActuatorStatus());
+
     public HardwareAlarmObserver(EnvironmentalAnalyzer analyzer) {
         this.analyzer = analyzer;
         this.analyzer.attach(this);
@@ -30,80 +25,63 @@ public class HardwareAlarmObserver implements IObserver {
 
     @Override
     public void update() {
-        if (analyzer.getCurrentMeasurement() == null) return;
+        Measurement m = analyzer.getCurrentMeasurement();
+        if (m == null) return;
 
-        this.basedOnMeasurementId = analyzer.getCurrentMeasurement().getId();
-        this.timestamp = LocalDateTime.now();
+        // 1. Creamos un objeto de estado LOCAL (100% seguro contra concurrencia)
+        ActuatorStatus newStatus = new ActuatorStatus();
+        newStatus.setBasedOnMeasurementId(m.getId());
+        newStatus.setTimestamp(LocalDateTime.now());
+        newStatus.setRgbColorCommand("#00FF00"); // Verde por defecto
 
         // Lógica de Silencio (Mute)
-        // Lógica de Silencio (Mute)
-        if (analyzer.getCurrentMeasurement().isButtonPressed() != null &&
-                analyzer.getCurrentMeasurement().isButtonPressed()) {
-            this.alarmMuted = true;
-            this.buzzerStatus = false;
-        } else {
-            this.alarmMuted = false;
-        }
+        boolean isMuted = m.isButtonPressed() != null && m.isButtonPressed();
 
-        resetActuators();
-
-        // 1. Le pedimos al Analizador los resultados procesados
+        // 2. Le pedimos al Analizador los resultados procesados
         List<AlgorithmResult> results = analyzer.getLatestAlgorithmResults();
 
-        // 2. Encendemos actuadores basados en esos resultados
+        // 3. Calculamos qué encender basados en esos resultados
         for (AlgorithmResult res : results) {
             switch (res.getAlgorithm()) {
                 case "TemperatureStrategy":
                     if (res.getValue() == 1.0f) { // Too Hot
-                        this.rgbColorCommand = "#FF0000"; // RED
-                        this.fanStatus = true;
-                        if (!alarmMuted) this.buzzerStatus = true;
+                        newStatus.setRgbColorCommand("#FF0000"); // RED
+                        newStatus.setFanStatus(true);
+                        if (!isMuted) newStatus.setBuzzerStatus(true);
                     } else if (res.getValue() == -1.0f) { // Too Cold
-                        this.rgbColorCommand = "#0000FF"; // BLUE
-                        this.resistorStatus = true;
-                        if (!alarmMuted) this.buzzerStatus = true;
+                        newStatus.setRgbColorCommand("#0000FF"); // BLUE
+                        newStatus.setResistorStatus(true);
+                        if (!isMuted) newStatus.setBuzzerStatus(true);
                     }
                     break;
                 case "HumidityStrategy":
                     if (res.getValue() == 1.0f) { // Watering required
-                        if (this.rgbColorCommand.equals("#00FF00")) this.rgbColorCommand = "#FFFFFF"; // WHITE
-                        this.motorStatus = true;
+                        if (newStatus.getRgbColorCommand().equals("#00FF00")) newStatus.setRgbColorCommand("#FFFFFF"); // WHITE
+                        newStatus.setMotorStatus(true);
                     }
                     break;
                 case "CO2Strategy":
                     if (res.getValue() == 1.0f) { // Ventilation required
-                        if (this.rgbColorCommand.equals("#00FF00")) this.rgbColorCommand = "#FFC0CB"; // PINK
-                        this.fanStatus = true;
-                        if (!alarmMuted) this.buzzerStatus = true;
+                        if (newStatus.getRgbColorCommand().equals("#00FF00")) newStatus.setRgbColorCommand("#FFC0CB"); // PINK
+                        newStatus.setFanStatus(true);
+                        if (!isMuted) newStatus.setBuzzerStatus(true);
                     }
                     break;
                 case "LightStrategy":
                     if (res.getValue() > 0) { // Light deficit
-                        if (this.rgbColorCommand.equals("#00FF00")) this.rgbColorCommand = "#FFFF00"; // YELLOW
-                        this.ledIntensityCommand = 80;
+                        if (newStatus.getRgbColorCommand().equals("#00FF00")) newStatus.setRgbColorCommand("#FFFF00"); // YELLOW
+                        newStatus.setLedIntensityCommand(80);
                     }
                     break;
             }
         }
+
+        // 4. Guardamos el resultado final en la caja fuerte atómica
+        this.currentStatus.set(newStatus);
     }
 
-    private void resetActuators() {
-        this.fanStatus = false;
-        if (!this.alarmMuted) this.buzzerStatus = false;
-        this.motorStatus = false;
-        this.resistorStatus = false;
-        this.rgbColorCommand = "#00FF00";
-        this.ledIntensityCommand = 0;
+    // NUEVO: Método seguro para que el controlador lea el estado
+    public ActuatorStatus getLatestStatus() {
+        return this.currentStatus.get();
     }
-
-    // --- GETTERS (Mantenemos los getters porque el ActuatorController los necesita) ---
-    public boolean isFanStatus() { return fanStatus; }
-    public boolean isBuzzerStatus() { return buzzerStatus; }
-    public boolean isMotorStatus() { return motorStatus; }
-    public boolean isResistorStatus() { return resistorStatus; }
-    public String getRgbColorCommand() { return rgbColorCommand; }
-    public int getLedIntensityCommand() { return ledIntensityCommand; }
-    public Integer getBasedOnMeasurementId() { return basedOnMeasurementId; }
-    public LocalDateTime getTimestamp() { return timestamp; }
-    public boolean isAlarmMuted() { return alarmMuted; }
 }
