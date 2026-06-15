@@ -19,7 +19,6 @@ public class MeasurementController {
 
     private final EnvironmentalAnalyzer analyzer;
     private final IMeasurementRepository repository;
-    private final HardwareAlarmObserver hardwareObserver;
 
     public MeasurementController(EnvironmentalAnalyzer analyzer, IMeasurementRepository repository) {
         this.analyzer = analyzer;
@@ -36,6 +35,10 @@ public class MeasurementController {
         m.setLight(input.getLight());
         m.setCo2(input.getCo2());
         m.setButtonPressed(input.getButtonPressed());
+
+        if (input.getSensorId() != null) {
+            m.setSensorId(input.getSensorId().toString());
+        }
 
         // Timestamp del servidor
         m.setTimestamp(LocalDateTime.now());

@@ -1,0 +1,11 @@
+### Enviar medición simulada (Mock) para T27
+POST http://localhost:8080/api/measurements
+Content-Type: application/json
+
+{
+  "temperature": 24.5,
+  "humidity": 60.0,
+  "light": 15000.0,
+  "co2": 800.0,
+  "buttonPressed": false
+}

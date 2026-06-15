@@ -7,6 +7,7 @@ import lombok.Data;
 
 @Data
 public class MeasurementInput {
+    private Long sensorId;
 
     @NotNull(message = "La temperatura es obligatoria")
     @DecimalMin(value = "-10.0", message = "La temperatura no puede ser menor a -10")
