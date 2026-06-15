@@ -12,6 +12,7 @@ export interface SensorReading {
   sensorId: string;
   temperature: number;
   humidity: number;
+  light: number;
   createdAt: string;
 }
 
@@ -41,4 +42,26 @@ export interface LatestReadingCardProps {
 
 export interface AlertBadgeProps {
   alert: Alert;
+}
+
+export interface CurrentTemperatureCardProps {
+  temperature: number;
+  sensorId: string;
+  timestamp: string;
+}
+
+export interface CurrentHumidityCardProps {
+  humidity: number;
+  sensorId: string;
+  timestamp: string;
+}
+
+export interface CurrentLightCardProps {
+  light: number;
+  sensorId: string;
+  timestamp: string;
+}
+
+export interface LightChartProps {
+  data: SensorReading[];
 }
