@@ -12,7 +12,7 @@ public class WebDashboardObserver implements IObserver {
     private String lastPayload = "{}";
 
     private final EnvironmentalAnalyzer analyzer;
-    private final ObjectMapper objectMapper; // <-- Agregamos el mapeador de JSON
+    private final ObjectMapper objectMapper;
 
     // Constructor Injection
     public WebDashboardObserver(EnvironmentalAnalyzer analyzer, ObjectMapper objectMapper) {
@@ -32,7 +32,7 @@ public class WebDashboardObserver implements IObserver {
             this.lastPayload = objectMapper.writeValueAsString(m);
             sendToFrontend();
         } catch (Exception e) {
-            System.err.println("Error al convertir la medición a JSON: " + e.getMessage());
+            System.err.println("Failed to serialize measurement to JSON: " + e.getMessage());
         }
     }
 

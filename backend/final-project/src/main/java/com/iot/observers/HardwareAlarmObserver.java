@@ -15,7 +15,6 @@ public class HardwareAlarmObserver implements IObserver {
 
     private final EnvironmentalAnalyzer analyzer;
 
-    // NUEVO: La "caja fuerte" que guarda el último estado de los actuadores de forma segura.
     private final AtomicReference<ActuatorStatus> currentStatus = new AtomicReference<>(new ActuatorStatus());
 
     public HardwareAlarmObserver(EnvironmentalAnalyzer analyzer) {

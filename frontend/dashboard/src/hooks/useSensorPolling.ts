@@ -8,8 +8,7 @@ export function useSensorPolling(
   intervalMs: number = POLLING_INTERVALS.SENSORS
 ): PollingState {
   
-  // useState se usa AQUÍ SOLO para que React sepa cuándo repintar la pantalla, 
-  // NO como el motor reactivo principal (Cumpliendo la consigna a rajatabla)
+  // useState se usa para que React sepa cuándo repintar la pantalla, 
   const [pollingState, setPollingState] = useState<PollingState>({
     data: [],
     loading: true,

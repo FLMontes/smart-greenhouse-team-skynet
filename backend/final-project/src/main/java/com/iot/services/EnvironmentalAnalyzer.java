@@ -23,10 +23,9 @@ public class EnvironmentalAnalyzer {
 
     // --- ESTADO CENTRALIZADO ---
     private Measurement currentMeasurement;
-    private Measurement currentAveragedMeasurement; // <-- NUEVO: Guardamos el dato promediado
+    private Measurement currentAveragedMeasurement; 
     private List<AlgorithmResult> latestAlgorithmResults = new ArrayList<>();
 
-    // NUEVO: Lista de alertas activas y un generador de IDs (Punto 6)
     private List<Alert> activeAlerts = new ArrayList<>();
     private final AtomicLong alertIdCounter = new AtomicLong(1);
 
@@ -55,7 +54,7 @@ public class EnvironmentalAnalyzer {
 
         // 2. Construir la medición promediada
         Measurement averaged = buildAveragedMeasurement(window);
-        this.currentAveragedMeasurement = averaged; // <-- NUEVO: Lo guardamos de forma segura
+        this.currentAveragedMeasurement = averaged; 
 
         // 3. Crear el Contexto de Análisis
         AnalysisContext context = new AnalysisContext(averaged, window, m.getId(), LocalDateTime.now());
@@ -70,7 +69,7 @@ public class EnvironmentalAnalyzer {
 
         this.latestAlgorithmResults = results;
 
-        // 5. NUEVO: Generar las alertas activas basadas en los resultados
+        // 5. Generar las alertas activas basadas en los resultados
         generateAlerts(results, m.getId());
 
         // 6. Notificar a los observadores
@@ -121,7 +120,7 @@ public class EnvironmentalAnalyzer {
 
     // --- GETTERS ---
     public Measurement getCurrentMeasurement() { return currentMeasurement; }
-    public Measurement getCurrentAveragedMeasurement() { return currentAveragedMeasurement; } // <-- NUEVO GETTER
+    public Measurement getCurrentAveragedMeasurement() { return currentAveragedMeasurement; } 
     public List<AlgorithmResult> getLatestAlgorithmResults() { return latestAlgorithmResults; }
     public List<Alert> getActiveAlerts() { return activeAlerts; }
 }

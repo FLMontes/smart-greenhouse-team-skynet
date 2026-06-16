@@ -12,7 +12,6 @@ public interface IMeasurementRepository {
 
     List<Measurement> getHistory(int limit, int offset);
 
-    // ¡ESTOS DOS SON LOS QUE JAVA NO ENCUENTRA!
     Measurement getLatest();
 
     List<Measurement> getLatestWindow(int windowSize);
