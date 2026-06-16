@@ -1,4 +1,9 @@
-'use client';
+/**
+ * Dashboard route — a React Server Component. Do **not** add `'use client'`.
+ *
+ * Composición del dashboard de invernadero inteligente con paneles de sensores actuales,
+ * gráficos históricos, alertas y tabla de historial.
+ */
 
 import { GreenhouseHeader } from '@/components/GreenhouseHeader';
 import { SensorComparisonChart } from '@/components/charts/SensorComparisonChart';
@@ -9,82 +14,78 @@ import { AlertBadge } from '@/components/widgets/AlertBadge';
 import { CurrentTemperatureCard } from '@/components/widgets/CurrentTemperatureCard';
 import { CurrentHumidityCard } from '@/components/widgets/CurrentHumidityCard';
 import { CurrentLightCard } from '@/components/widgets/CurrentLightCard';
-import { useSensorPolling } from '@/hooks/useSensorPolling';
+import { HistoryTable } from '@/components/HistoryTable'; // <-- ESTA ES LA LÍNEA QUE SE HABÍA BORRADO
 import type { Alert, SensorReading } from '@/types/sensor.types';
 import { PLACEHOLDER_READINGS } from '@/constants';
 
 const placeholderReading: SensorReading = {
   id: 0,
-  sensorId: 'ESP32-01',
+  sensorId: 'SENSOR-001',
   temperature: PLACEHOLDER_READINGS.temperature,
   humidity: PLACEHOLDER_READINGS.humidity,
   light: PLACEHOLDER_READINGS.light,
-  co2: 450,
-  buttonPressed: false,
   createdAt: new Date().toISOString(),
 };
 
-const healthyAlert: Alert = {
-  id: 0,
-  type: 'SYSTEM_OK',
-  sensorId: 'ESP32-01',
-  message: 'Todos los sistemas operan normalmente',
+const placeholderAlert: Alert = {
+  sensorId: 'SENSOR-001',
+  message: 'Todos los sistemas operativos normalmente',
   severity: 'low',
-  active: true,
-  relatedMeasurementId: null,
   triggeredAt: new Date().toISOString(),
 };
 
-export function DashboardClient() {
-  const { data, latestReading, alerts, loading, error, lastUpdate } = useSensorPolling();
-  const currentReading = latestReading ?? data.at(-1) ?? placeholderReading;
-  const currentAlert = alerts[0] ?? healthyAlert;
-  const isOnline = !error;
+export default function DashboardPage() {
+  const readings: SensorReading[] = [];
+  const now = new Date().toISOString();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 p-6">
       <div className="mx-auto max-w-7xl">
-        <GreenhouseHeader isOnline={isOnline} lastUpdate={lastUpdate} />
+        {/* Header del Invernadero */}
+        <GreenhouseHeader isOnline={true} lastUpdate={now} />
 
-        {error ? (
-          <div className="mb-6 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-800">
-            No se pudo conectar con el backend: {error.message}
-          </div>
-        ) : null}
-
-        {loading ? (
-          <div className="mb-6 rounded-lg border border-emerald-200 bg-white px-4 py-3 text-sm font-medium text-emerald-800">
-            Cargando datos del invernadero...
-          </div>
-        ) : null}
-
+        {/* Paneles de Sensores Actuales */}
         <section className="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <CurrentTemperatureCard
-            temperature={currentReading.temperature}
-            sensorId={currentReading.sensorId}
-            timestamp={currentReading.createdAt}
+            temperature={placeholderReading.temperature}
+            sensorId={placeholderReading.sensorId}
+            timestamp={placeholderReading.createdAt}
           />
           <CurrentHumidityCard
-            humidity={currentReading.humidity}
-            sensorId={currentReading.sensorId}
-            timestamp={currentReading.createdAt}
+            humidity={placeholderReading.humidity}
+            sensorId={placeholderReading.sensorId}
+            timestamp={placeholderReading.createdAt}
           />
           <CurrentLightCard
-            light={currentReading.light}
-            sensorId={currentReading.sensorId}
-            timestamp={currentReading.createdAt}
+            light={placeholderReading.light}
+            sensorId={placeholderReading.sensorId}
+            timestamp={placeholderReading.createdAt} 
           />
-          <AlertBadge alert={currentAlert} />
+          <div>
+            <AlertBadge alert={placeholderAlert} />
+          </div>
         </section>
 
+        {/* Gráficos Históricos - Fila 1 */}
         <section className="mb-6 grid gap-4 lg:grid-cols-2">
-          <TemperatureChart data={data} />
-          <HumidityChart data={data} />
+          <TemperatureChart data={readings} />
+          <HumidityChart data={readings} />
         </section>
 
+        {/* Gráficos Históricos - Fila 2 */}
         <section className="mb-6 grid gap-4 lg:grid-cols-2">
-          <LightChart data={data} />
-          <SensorComparisonChart data={data} />
+          <LightChart data={readings} />
+          <SensorComparisonChart data={readings} />
+        </section>
+
+        {/* Nueva Sección de la Tabla Interactiva Real */}
+        <section className="mt-8">
+          <div className="mb-4">
+            <h2 className="text-xl font-bold text-gray-800">Registros Históricos Detallados</h2>
+            <p className="text-sm text-gray-500">Explora las mediciones tomadas por los sensores de manera tabular.</p>
+          </div>
+          {/* Llamada limpia sin props que TypeScript ya reconoce */}
+          <HistoryTable />
         </section>
       </div>
     </div>
