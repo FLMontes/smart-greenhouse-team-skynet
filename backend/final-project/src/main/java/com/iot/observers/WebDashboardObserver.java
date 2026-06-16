@@ -23,8 +23,8 @@ public class WebDashboardObserver implements IObserver {
 
     @Override
     public void update() {
-        // CAMBIO: Ahora consultamos el dato promediado y seguro en lugar del crudo
-        Measurement m = analyzer.getCurrentAveragedMeasurement();
+        
+        Measurement m = analyzer.getCurrentMeasurement();
 
         if (m == null) return;
 

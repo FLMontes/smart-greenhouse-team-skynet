@@ -18,76 +18,92 @@ import { HistoryTable } from '@/components/HistoryTable'; // <-- ESTA ES LA LÍN
 import type { Alert, SensorReading } from '@/types/sensor.types';
 import { PLACEHOLDER_READINGS } from '@/constants';
 
+const now = new Date().toISOString();
+
 const placeholderReading: SensorReading = {
   id: 0,
-  sensorId: 'SENSOR-001',
+  sensorId: 1,
   temperature: PLACEHOLDER_READINGS.temperature,
   humidity: PLACEHOLDER_READINGS.humidity,
   light: PLACEHOLDER_READINGS.light,
-  createdAt: new Date().toISOString(),
+  co2: 420,
+  buttonPressed: false,
+  timestamp: now,
+  createdAt: now,
 };
 
-const placeholderAlert: Alert = {
-  sensorId: 'SENSOR-001',
-  message: 'Todos los sistemas operativos normalmente',
-  severity: 'low',
-  triggeredAt: new Date().toISOString(),
-};
+function buildPlaceholderAlert(reading: SensorReading): Alert {
+  const triggeredAt = new Date().toISOString();
 
-export default function DashboardPage() {
-  const readings: SensorReading[] = [];
-  const now = new Date().toISOString();
+  if (reading.temperature > 30) {
+    return {
+      sensorId: reading.sensorId,
+      message: 'Alerta: temperatura elevada. Se recomienda activar ventilación.',
+      severity: 'high',
+      triggeredAt,
+    };
+  }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 p-6">
-      <div className="mx-auto max-w-7xl">
-        {/* Header del Invernadero */}
-        <GreenhouseHeader isOnline={true} lastUpdate={now} />
+  if (reading.temperature < 15) {
+    return {
+      sensorId: reading.sensorId,
+      message: 'Alerta: temperatura baja. Se recomienda activar calefacción.',
+      severity: 'medium',
+      triggeredAt,
+    };
+  }
 
-        {/* Paneles de Sensores Actuales */}
-        <section className="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <CurrentTemperatureCard
-            temperature={placeholderReading.temperature}
-            sensorId={placeholderReading.sensorId}
-            timestamp={placeholderReading.createdAt}
-          />
-          <CurrentHumidityCard
-            humidity={placeholderReading.humidity}
-            sensorId={placeholderReading.sensorId}
-            timestamp={placeholderReading.createdAt}
-          />
-          <CurrentLightCard
-            light={placeholderReading.light}
-            sensorId={placeholderReading.sensorId}
-            timestamp={placeholderReading.createdAt} 
-          />
-          <div>
-            <AlertBadge alert={placeholderAlert} />
-          </div>
-        </section>
+  if (reading.humidity < 40) {
+    return {
+      sensorId: reading.sensorId,
+      message: 'Alerta: humedad baja. Se recomienda activar riego.',
+      severity: 'medium',
+      triggeredAt,
+    };
+  }
 
-        {/* Gráficos Históricos - Fila 1 */}
-        <section className="mb-6 grid gap-4 lg:grid-cols-2">
-          <TemperatureChart data={readings} />
-          <HumidityChart data={readings} />
-        </section>
+  if (reading.humidity > 80) {
+    return {
+      sensorId: reading.sensorId,
+      message: 'Alerta: humedad elevada. Revisar ventilación del invernadero.',
+      severity: 'medium',
+      triggeredAt,
+    };
+  }
 
-        {/* Gráficos Históricos - Fila 2 */}
-        <section className="mb-6 grid gap-4 lg:grid-cols-2">
-          <LightChart data={readings} />
-          <SensorComparisonChart data={readings} />
-        </section>
+  if (reading.light < 300) {
+    return {
+      sensorId: reading.sensorId,
+      message: 'Alerta: nivel de luz bajo. Revisar iluminación del invernadero.',
+      severity: 'low',
+      triggeredAt,
+    };
+  }
 
-        {/* Nueva Sección de la Tabla Interactiva Real */}
-        <section className="mt-8">
-          <div className="mb-4">
-            <h2 className="text-xl font-bold text-gray-800">Registros Históricos Detallados</h2>
-            <p className="text-sm text-gray-500">Explora las mediciones tomadas por los sensores de manera tabular.</p>
-          </div>
-          {/* Llamada limpia sin props que TypeScript ya reconoce */}
-          <HistoryTable />
-        </section>
-      </div>
-    </div>
-  );
+  if (reading.co2 > 1000) {
+    return {
+      sensorId: reading.sensorId,
+      message: 'Alerta: nivel de CO₂ elevado. Se recomienda ventilar el invernadero.',
+      severity: 'high',
+      triggeredAt,
+    };
+  }
+
+  if (reading.buttonPressed) {
+    return {
+      sensorId: reading.sensorId,
+      message: 'Alerta manual activada desde el botón físico.',
+      severity: 'medium',
+      triggeredAt,
+    };
+  }
+
+  return {
+    sensorId: reading.sensorId,
+    message: 'Condiciones normales. No se requieren acciones correctivas.',
+    severity: 'low',
+    triggeredAt,
+  };
 }
+
+const placeholderAlert: Alert = buildPlaceholderAlert(placeholderReading);

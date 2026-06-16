@@ -4,9 +4,12 @@ import type { SensorReading, Alert } from '@/types/sensor.types';
 const API_BASE_URL = config.api.baseUrl;
 
 function normalizeSensorReading(reading: SensorReading): SensorReading {
+  const date = reading.createdAt ?? reading.timestamp;
+
   return {
     ...reading,
-    createdAt: reading.createdAt ?? reading.timestamp,
+    createdAt: date,
+    timestamp: reading.timestamp ?? date,
   };
 }
 
@@ -18,6 +21,7 @@ export const sensorService = {
       const response = await fetch(`${API_BASE_URL}/api/measurements?limit=${limit}&offset=${offset}`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
         signal: AbortSignal.timeout(config.api.timeout),
       });
 
@@ -37,6 +41,7 @@ export const sensorService = {
       const response = await fetch(`${API_BASE_URL}/api/measurements/latest`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
         signal: AbortSignal.timeout(config.api.timeout),
       });
 
@@ -59,6 +64,7 @@ export const sensorService = {
       const response = await fetch(`${API_BASE_URL}/api/alerts`, {
         method: 'GET',
         headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
         signal: AbortSignal.timeout(config.api.timeout),
       });
 
@@ -84,6 +90,7 @@ export const sensorService = {
         {
           method: 'GET',
           headers: { 'Content-Type': 'application/json' },
+          cache: 'no-store',
           signal: AbortSignal.timeout(config.api.timeout),
         }
       );
@@ -94,11 +101,11 @@ export const sensorService = {
       const normalizedReadings = readings.map(normalizeSensorReading);
 
       const filteredData = dateFilter
-        ? readings.filter((reading) => {
-            const readingDate = reading.timestamp ?? reading.createdAt;
+        ? normalizedReadings.filter((reading) => {
+            const readingDate = reading.createdAt ?? reading.timestamp;
             return readingDate?.startsWith(dateFilter);
           })
-        : readings;
+        : normalizedReadings;
 
       return {
         data: filteredData,

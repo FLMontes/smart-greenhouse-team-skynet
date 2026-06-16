@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Component
 public class HumidityStrategy implements IAlgorithmStrategy {
 
-    private static final float DEFAULT_MIN_HUMIDITY = 40.0f;
+    private static final float DEFAULT_MIN_HUMIDITY = 30.0f;
     private float minHumidity;
 
     public HumidityStrategy() {
