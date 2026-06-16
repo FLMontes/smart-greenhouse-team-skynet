@@ -2,7 +2,7 @@
  * Dashboard route — a React Server Component. Do **not** add `'use client'`.
  *
  * Composición del dashboard de invernadero inteligente con paneles de sensores actuales,
- * gráficos históricos y alertas.
+ * gráficos históricos, alertas y tabla de historial.
  */
 
 import { GreenhouseHeader } from '@/components/GreenhouseHeader';
@@ -14,6 +14,10 @@ import { AlertBadge } from '@/components/widgets/AlertBadge';
 import { CurrentTemperatureCard } from '@/components/widgets/CurrentTemperatureCard';
 import { CurrentHumidityCard } from '@/components/widgets/CurrentHumidityCard';
 import { CurrentLightCard } from '@/components/widgets/CurrentLightCard';
+
+// Cambiamos a ruta relativa para obligar a Next.js a encontrar el archivo de la tabla interactiva
+import { HistoryTable } from '../../components/HistoryTable'; 
+
 import type { Alert, SensorReading } from '@/types/sensor.types';
 import { PLACEHOLDER_READINGS } from '@/constants';
 
@@ -55,10 +59,11 @@ export default function DashboardPage() {
             sensorId={placeholderReading.sensorId}
             timestamp={placeholderReading.createdAt}
           />
+          {/* Corregido con 'timestamp' exacto y todas sus propiedades juntas */}
           <CurrentLightCard
             light={placeholderReading.light}
             sensorId={placeholderReading.sensorId}
-            timestamp={placeholderReading.createdAt}
+            timestamp={placeholderReading.createdAt} 
           />
           <div>
             <AlertBadge alert={placeholderAlert} />
@@ -75,6 +80,15 @@ export default function DashboardPage() {
         <section className="mb-6 grid gap-4 lg:grid-cols-2">
           <LightChart data={readings} />
           <SensorComparisonChart data={readings} />
+        </section>
+
+        {/* Nueva Sección de la Tabla Interactiva Real */}
+        <section className="mt-8">
+          <div className="mb-4">
+            <h2 className="text-xl font-bold text-gray-800">Registros Históricos Detallados</h2>
+            <p className="text-sm text-gray-500">Explora las mediciones tomadas por los sensores de manera tabular.</p>
+          </div>
+          <HistoryTable />
         </section>
       </div>
     </div>
