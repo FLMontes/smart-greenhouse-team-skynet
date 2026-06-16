@@ -12,7 +12,7 @@ namespace sensors {
  */
 struct SensorReading {
     String deviceId;
-    String sensorId;
+    long sensorId;
     float temperature;
     float humidity;
     float co2;

@@ -1,18 +1,21 @@
 /**
  * This file holds all TypeScript interfaces matching the backend API response shapes.
  *
- * - {@link SensorReading} — shape returned by GET /sensors (id, sensorId, temperature, humidity, createdAt)
- * - {@link Alert} — alert payload for the dashboard (sensorId, message, severity, triggeredAt)
+ * - SensorReading — shape returned by GET /api/measurements and GET /api/measurements/latest
+ * - Alert — alert payload for the dashboard
  */
 
 export type AlertSeverity = 'low' | 'medium' | 'high';
 
 export interface SensorReading {
   id: number;
-  sensorId: string;
+  sensorId: number;
   temperature: number;
   humidity: number;
   light: number;
+  co2: number;
+  timestamp: string;
+  buttonPressed: boolean;
   createdAt: string;
 }
 
