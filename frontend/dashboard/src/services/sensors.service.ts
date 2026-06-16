@@ -57,5 +57,32 @@ export const sensorService = {
       console.error('Failed to fetch alerts:', error);
       return [];
     }
+  },
+
+  // 3. Función mockeada para obtener historial con paginación integrada al servicio
+  async getHistoricalReadings(page: number, limit: number, dateFilter?: string): Promise<{ data: SensorReading[], total: number }> {
+    // Aquí iría el fetch real al backend: fetch(`/api/history?page=${page}&limit=${limit}&date=${dateFilter}`)
+    
+    // Mock data para propósitos de demostración
+    const mockData: SensorReading[] = Array.from({ length: 50 }).map((_, i) => ({
+      id: i,
+      sensorId: 'sensor-1',
+      temperature: 20 + Math.random() * 10,
+      humidity: 50 + Math.random() * 30,
+      light: 300 + Math.random() * 200,
+      createdAt: new Date(Date.now() - i * 60000).toISOString(), // Restando minutos
+    }));
+
+    const filteredData = dateFilter 
+      ? mockData.filter(d => d.createdAt.startsWith(dateFilter))
+      : mockData;
+
+    const start = (page - 1) * limit;
+    const paginatedData = filteredData.slice(start, start + limit);
+
+    return {
+      data: paginatedData,
+      total: filteredData.length,
+    };
   }
 };
