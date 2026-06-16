@@ -45,7 +45,6 @@ public class HardwareAlarmObserver implements IObserver {
                 case "TemperatureStrategy":
                     if (res.getValue() == 1.0f) { // Too Hot
                         newStatus.setRgbColorCommand("#FF0000"); // RED
-                        newStatus.setFanStatus(true);
                         if (!isMuted) newStatus.setBuzzerStatus(true);
                     } else if (res.getValue() == -1.0f) { // Too Cold
                         newStatus.setRgbColorCommand("#0000FF"); // BLUE
@@ -61,9 +60,15 @@ public class HardwareAlarmObserver implements IObserver {
                     break;
                 case "CO2Strategy":
                     if (res.getValue() == 1.0f) { // Ventilation required
-                        if (newStatus.getRgbColorCommand().equals("#00FF00")) newStatus.setRgbColorCommand("#FFC0CB"); // PINK
+                        if (newStatus.getRgbColorCommand().equals("#00FF00")) {
+                            newStatus.setRgbColorCommand("#FFC0CB"); // PINK
+                        }
+
                         newStatus.setFanStatus(true);
-                        if (!isMuted) newStatus.setBuzzerStatus(true);
+
+                        if (!isMuted) {
+                            newStatus.setBuzzerStatus(true);
+                        }
                     }
                     break;
                 case "LightStrategy":

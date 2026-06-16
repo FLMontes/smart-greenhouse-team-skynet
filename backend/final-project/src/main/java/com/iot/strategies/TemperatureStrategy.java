@@ -8,8 +8,8 @@ import java.time.LocalDateTime;
 @Component
 public class TemperatureStrategy implements IAlgorithmStrategy {
 
-    private static final float DEFAULT_MIN_TEMPERATURE = 15.0f;
-    private static final float DEFAULT_MAX_TEMPERATURE = 35.0f;
+    private static final float DEFAULT_MIN_TEMPERATURE = 19.5f;
+    private static final float DEFAULT_MAX_TEMPERATURE = 27.0f;
 
     private float minTemperature;
     private float maxTemperature;

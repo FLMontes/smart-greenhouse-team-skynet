@@ -20,7 +20,7 @@ export interface SensorReading {
 }
 
 export interface Alert {
-  sensorId: string;
+  sensorId: number;
   message: string;
   severity: AlertSeverity;
   triggeredAt: string;
@@ -32,6 +32,14 @@ export interface TemperatureChartProps {
 }
 
 export interface HumidityChartProps {
+  data: SensorReading[];
+}
+
+export interface LightChartProps {
+  data: SensorReading[];
+}
+
+export interface CO2ChartProps {
   data: SensorReading[];
 }
 
@@ -65,6 +73,8 @@ export interface CurrentLightCardProps {
   timestamp: string;
 }
 
-export interface LightChartProps {
-  data: SensorReading[];
+export interface CurrentCO2CardProps {
+  co2: number;
+  sensorId: string;
+  timestamp: string;
 }

@@ -37,9 +37,9 @@ export function CurrentLightCard({
       <div className="mb-4">
         <div className="flex items-baseline gap-2">
           <span className="text-5xl font-bold text-amber-700">
-            {(light / 1000).toFixed(1)}
+            {light.toFixed(1)}
           </span>
-          <span className="text-lg font-semibold text-gray-600">klux</span>
+          <span className="text-lg font-semibold text-gray-600">lux</span>
         </div>
       </div>
 
