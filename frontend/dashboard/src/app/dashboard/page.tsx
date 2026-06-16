@@ -14,21 +14,13 @@ import { AlertBadge } from '@/components/widgets/AlertBadge';
 import { CurrentTemperatureCard } from '@/components/widgets/CurrentTemperatureCard';
 import { CurrentHumidityCard } from '@/components/widgets/CurrentHumidityCard';
 import { CurrentLightCard } from '@/components/widgets/CurrentLightCard';
+import { sensorService } from '@/services/sensors.service';
 
 // Cambiamos a ruta relativa para obligar a Next.js a encontrar el archivo de la tabla interactiva
 import { HistoryTable } from '../../components/HistoryTable'; 
 
 import type { Alert, SensorReading } from '@/types/sensor.types';
-import { PLACEHOLDER_READINGS } from '@/constants';
 
-const placeholderReading: SensorReading = {
-  id: 0,
-  sensorId: 'SENSOR-001',
-  temperature: PLACEHOLDER_READINGS.temperature,
-  humidity: PLACEHOLDER_READINGS.humidity,
-  light: PLACEHOLDER_READINGS.light,
-  createdAt: new Date().toISOString(),
-};
 
 const placeholderAlert: Alert = {
   sensorId: 'SENSOR-001',
@@ -37,52 +29,66 @@ const placeholderAlert: Alert = {
   triggeredAt: new Date().toISOString(),
 };
 
-export default function DashboardPage() {
-  const readings: SensorReading[] = [];
-  const now = new Date().toISOString();
+export default async function DashboardPage() {
+  const readings: SensorReading[] = await sensorService.getSensorReadings(100, 0);
+  const latestReading = await sensorService.getLatestReadings();
+
+  const currentReading =
+    latestReading ??
+    readings[0] ??
+    {
+      id: 0,
+      sensorId: 0,
+      temperature: 0,
+      humidity: 0,
+      light: 0,
+      co2: 0,
+      timestamp: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+      buttonPressed: false,
+    };
+
+  const now = currentReading.createdAt;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-50 p-6">
       <div className="mx-auto max-w-7xl">
-        {/* Header del Invernadero */}
         <GreenhouseHeader isOnline={true} lastUpdate={now} />
 
-        {/* Paneles de Sensores Actuales */}
         <section className="mb-6 grid gap-4 md:grid-cols-2 lg:grid-cols-4">
           <CurrentTemperatureCard
-            temperature={placeholderReading.temperature}
-            sensorId={placeholderReading.sensorId}
-            timestamp={placeholderReading.createdAt}
+            temperature={currentReading.temperature}
+            sensorId={String(currentReading.sensorId)}
+            timestamp={currentReading.createdAt}
           />
+
           <CurrentHumidityCard
-            humidity={placeholderReading.humidity}
-            sensorId={placeholderReading.sensorId}
-            timestamp={placeholderReading.createdAt}
+            humidity={currentReading.humidity}
+            sensorId={String(currentReading.sensorId)}
+            timestamp={currentReading.createdAt}
           />
-          {/* Corregido con 'timestamp' exacto y todas sus propiedades juntas */}
+
           <CurrentLightCard
-            light={placeholderReading.light}
-            sensorId={placeholderReading.sensorId}
-            timestamp={placeholderReading.createdAt} 
+            light={currentReading.light}
+            sensorId={String(currentReading.sensorId)}
+            timestamp={currentReading.createdAt}
           />
+
           <div>
             <AlertBadge alert={placeholderAlert} />
           </div>
         </section>
 
-        {/* Gráficos Históricos - Fila 1 */}
         <section className="mb-6 grid gap-4 lg:grid-cols-2">
           <TemperatureChart data={readings} />
           <HumidityChart data={readings} />
         </section>
 
-        {/* Gráficos Históricos - Fila 2 */}
         <section className="mb-6 grid gap-4 lg:grid-cols-2">
           <LightChart data={readings} />
           <SensorComparisonChart data={readings} />
         </section>
 
-        {/* Nueva Sección de la Tabla Interactiva Real */}
         <section className="mt-8">
           <div className="mb-4">
             <h2 className="text-xl font-bold text-gray-800">Registros Históricos Detallados</h2>
