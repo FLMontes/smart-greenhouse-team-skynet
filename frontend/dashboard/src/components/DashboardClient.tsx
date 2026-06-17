@@ -14,7 +14,7 @@ import { AlertBadge } from '@/components/widgets/AlertBadge';
 import { CurrentTemperatureCard } from '@/components/widgets/CurrentTemperatureCard';
 import { CurrentHumidityCard } from '@/components/widgets/CurrentHumidityCard';
 import { CurrentLightCard } from '@/components/widgets/CurrentLightCard';
-import { HistoryTable } from '@/components/HistoryTable'; // <-- ESTA ES LA LÍNEA QUE SE HABÍA BORRADO
+import { HistoryTable } from '@/components/HistoryTable';
 import type { Alert, SensorReading } from '@/types/sensor.types';
 import { PLACEHOLDER_READINGS } from '@/constants';
 

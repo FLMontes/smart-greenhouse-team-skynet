@@ -92,7 +92,6 @@ public:
     {
         const int rawValue = analogRead(pin_);
 
-        // Raw MQ-135 ADC value. Calibration is still required for real ppm.
         reading.co2 = static_cast<float>(rawValue);
     }
 

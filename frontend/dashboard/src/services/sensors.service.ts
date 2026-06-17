@@ -15,7 +15,6 @@ function normalizeSensorReading(reading: SensorReading): SensorReading {
 
 export const sensorService = {
   
-  // 1. Corregido para pegarle a /api/measurements y manejar paginación (limit/offset)
     async getSensorReadings(limit = 100, offset = 0): Promise<SensorReading[]> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/measurements?limit=${limit}&offset=${offset}`, {
@@ -35,7 +34,6 @@ export const sensorService = {
     }
   },
 
-  // 2. Corregido para retornar un SOLO objeto (SensorReading) y la URL correcta
     async getLatestReadings(): Promise<SensorReading | null> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/measurements/latest`, {
@@ -76,7 +74,7 @@ export const sensorService = {
     }
   },
 
-    // 3. Historial real desde el backend
+    // Historial real desde el backend
   async getHistoricalReadings(
     page: number,
     limit: number,
