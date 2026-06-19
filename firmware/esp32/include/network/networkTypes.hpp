@@ -1,14 +1,23 @@
 #ifndef FIRMWARE_ESP32_INCLUDE_NETWORK_NETWORK_TYPES_HPP
 #define FIRMWARE_ESP32_INCLUDE_NETWORK_NETWORK_TYPES_HPP
 
+#include <Arduino.h>
+#include <stdint.h>
+
 namespace network {
 
-/**
- * @brief Result of the LED control query against the backend.
- */
-struct LedState {
-  bool enabled;
-  bool known;
+struct ActuatorState {
+    bool known;
+    bool fanStatus;
+    bool buzzerStatus;
+    bool motorStatus;
+    bool resistorStatus;
+
+    uint8_t rgbRed;
+    uint8_t rgbGreen;
+    uint8_t rgbBlue;
+
+    uint8_t ledIntensity;
 };
 
 }  // namespace network
