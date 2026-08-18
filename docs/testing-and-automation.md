@@ -6,7 +6,7 @@ Este documento describe los comandos locales de pruebas, lint, hooks de Git e In
 
 | Componente | Ruta                           |
 | ---------- | ------------------------------ |
-| Backend    | `backend/spring/final-project` |
+| Backend    | `backend/final-project` |
 | Frontend   | `frontend/dashboard`           |
 | Firmware   | `firmware/esp32`               |
 | CI         | `.github/workflows/ci.yml`     |
@@ -20,7 +20,7 @@ Este documento describe los comandos locales de pruebas, lint, hooks de Git e In
 Desde la raíz del repositorio:
 
 ```bash
-cd backend/spring/final-project
+cd backend/final-project
 ./gradlew build
 ./gradlew test
 ./gradlew checkstyleMain checkstyleTest

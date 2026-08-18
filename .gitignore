@@ -39,7 +39,6 @@ target/
 .project
 .settings/
 hs_err_pid*
-backend/springboot/.mvn/wrapper/maven-wrapper.jar
 
 # =========================
 # Python / Flask
@@ -97,3 +96,6 @@ docker/volumes/
 
 openspec/
 skills-lock.json
+
+# Gradle local cache
+**/.gradle/

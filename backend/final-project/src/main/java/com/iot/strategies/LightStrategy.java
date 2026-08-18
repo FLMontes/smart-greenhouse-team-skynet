@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Component
 public class LightStrategy implements IAlgorithmStrategy {
 
-    private static final float DEFAULT_TARGET_LIGHT = 19.0f;
+    private static final float DEFAULT_TARGET_LIGHT = 500.0f;
     private float targetLightLevel;
 
     public LightStrategy() {

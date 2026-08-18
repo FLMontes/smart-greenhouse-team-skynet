@@ -29,7 +29,7 @@ The project uses a centralized `.env` file at the root directory. Configure it b
 
 ```bash
 # From the project root
-cd /path/to/soft-eng-2026-final-project
+cd /path/to/smart-greenhouse-team-skynet
 cp .env.example .env
 ```
 

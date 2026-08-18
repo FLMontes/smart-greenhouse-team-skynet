@@ -12,7 +12,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: backend/spring/final-project
+        working-directory: backend/final-project
 
     steps:
       - name: Checkout repository

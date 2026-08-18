@@ -1,5 +1,7 @@
 #include "sensors/sensorFactory.hpp"
 
+#include "sensors/sensorTypes.hpp"
+
 #include <Arduino.h>
 #include <Adafruit_HTU21DF.h>
 #include <BH1750.h>

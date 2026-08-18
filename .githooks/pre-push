@@ -4,7 +4,7 @@ set -e
 ROOT_DIR="$(git rev-parse --show-toplevel)"
 
 echo "Running backend unit tests..."
-cd "$ROOT_DIR/backend/spring/final-project"
+cd "$ROOT_DIR/backend/final-project"
 
 if [ -f "./gradlew" ]; then
     ./gradlew test

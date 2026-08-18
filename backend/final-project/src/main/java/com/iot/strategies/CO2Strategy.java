@@ -8,7 +8,7 @@ import java.time.LocalDateTime;
 @Component
 public class CO2Strategy implements IAlgorithmStrategy {
 
-    private static final float DEFAULT_MAX_CO2 = 250.0f;
+    private static final float DEFAULT_MAX_CO2 = 1000.0f;
     private float maxCO2;
 
     public CO2Strategy() {
@@ -25,7 +25,7 @@ public class CO2Strategy implements IAlgorithmStrategy {
         float avgCo2 = context.getAveragedMeasurement().getCo2();
 
         // 2. Evaluamos si necesita ventilación (1.0 = Sí, 0.0 = No)
-        float statusValue = (avgCo2 < maxCO2) ? 1.0f : 0.0f;
+        float statusValue = (avgCo2 > maxCO2) ? 1.0f : 0.0f;
 
         return new AlgorithmResult(
                 "CO2Strategy",

@@ -4,6 +4,6 @@ services:
     environment:
       - 'POSTGRES_DB=soft_eng_db'
       - 'POSTGRES_USER=soft_eng_user'
-      - 'POSTGRES_PASSWORD=dev_password_2026'
+      - "POSTGRES_PASSWORD=${POSTGRES_PASSWORD}"
     ports:
       - '5433:5432'

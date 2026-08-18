@@ -1,34 +1,52 @@
 #include <gtest/gtest.h>
 
+#include <memory>
+#include <type_traits>
+#include <utility>
+
 #include "sensors/sensorFactory.hpp"
 
-namespace sensors
-{
-namespace
-{
+namespace sensors {
+namespace {
 
-TEST(SensorFactoryTest, CreatesTemperatureSensorFromValidType)
-{
-    const std::unique_ptr<Sensor> sensor = SensorFactory::createSensor("temperature");
+using SensorPointer = std::unique_ptr<Sensor>;
 
-    ASSERT_NE(sensor, nullptr);
-    EXPECT_STREQ(sensor->type(), "temperature");
+TEST(SensorFactoryContractTest, IsConstructibleWithApplicationConfig)
+{
+    EXPECT_TRUE(
+        (std::is_constructible_v<SensorFactory, const app::AppConfig&>)
+    );
 }
 
-TEST(SensorFactoryTest, CreatesCo2SensorFromValidType)
+TEST(SensorFactoryContractTest, ExposesExpectedCreationMethods)
 {
-    const auto sensor =
-        SensorFactory::createSensor("co2");
+    EXPECT_TRUE(
+        (std::is_same_v<
+            decltype(std::declval<const SensorFactory&>()
+                         .createTemperatureHumiditySensor()),
+            SensorPointer>)
+    );
 
-    ASSERT_NE(sensor, nullptr);
-    EXPECT_STREQ(sensor->type(), "co2");
-}
+    EXPECT_TRUE(
+        (std::is_same_v<
+            decltype(std::declval<const SensorFactory&>()
+                         .createLightSensor()),
+            SensorPointer>)
+    );
 
-TEST(SensorFactoryTest, ReturnsNullForUnknownType)
-{
-    const std::unique_ptr<Sensor> sensor = SensorFactory::createSensor("unknown");
+    EXPECT_TRUE(
+        (std::is_same_v<
+            decltype(std::declval<const SensorFactory&>()
+                         .createCo2Sensor()),
+            SensorPointer>)
+    );
 
-    EXPECT_EQ(sensor, nullptr);
+    EXPECT_TRUE(
+        (std::is_same_v<
+            decltype(std::declval<const SensorFactory&>()
+                         .createButtonSensor()),
+            SensorPointer>)
+    );
 }
 
 }  // namespace

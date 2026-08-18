@@ -18,7 +18,7 @@ export function formatSensorReading(
   reading: SensorReading,
 ): FormattedSensorReading {
   return {
-    sensorId: reading.sensorId,
+    sensorId: String(reading.sensorId),
     temperature: `${reading.temperature.toFixed(1)} C`,
     humidity: `${reading.humidity.toFixed(1)}%`,
     createdAt: dateFormatter.format(new Date(reading.createdAt)),

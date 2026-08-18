@@ -4,9 +4,10 @@
 #include <memory>
 
 #include "appConfig.hpp"
-#include "sensors/sensorTypes.hpp"
 
 namespace sensors {
+
+struct SensorReading;
 
 class Sensor {
 public:

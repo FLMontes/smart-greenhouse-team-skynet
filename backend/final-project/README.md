@@ -52,7 +52,7 @@ If Gradle still picks an old JDK, your IDE or another terminal may be overriding
 ## Run
 
 ```bash
-cd backend/spring/final-project
+cd backend/final-project
 ./gradlew bootRun
 ```
 
